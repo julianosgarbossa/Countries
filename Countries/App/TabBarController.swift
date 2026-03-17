@@ -17,7 +17,7 @@ class TabBarController: UITabBarController {
     private func configViews() {
         let countries = createNavController(viewController: UIViewController(), title: "Países", imageName: "magnifyingglass")
         let favorite = createNavController(viewController: UIViewController(), title: "Favoritos", imageName: "star")
-        let profile = createNavController(viewController: UIViewController(), title: "Perfil", imageName: "gear")
+        let profile = createNavController(viewController: ProfileViewController(), title: "Perfil", imageName: "gear")
         
         viewControllers = [countries, favorite, profile]
         customizeTabBarAppearance()

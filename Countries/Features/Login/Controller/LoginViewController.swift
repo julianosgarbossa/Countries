@@ -22,11 +22,17 @@ class LoginViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        navigationController?.navigationBar.isHidden = true
+        configNavigationControler()
     }
     
     func configProtocols() {
         loginScreen?.delegate(delegate: self)
+    }
+    
+    func configNavigationControler() {
+        navigationController?.navigationBar.isHidden = true
+        navigationController?.navigationBar.tintColor = .white
+        navigationItem.backButtonTitle = "Login"
     }
 }
 
@@ -40,6 +46,7 @@ extension LoginViewController: LoginScreenDelegate {
     }
     
     func didTapRegisterButton() {
-        print("Navegando Tela Registro...")
+        let registerViewController = RegisterViewController()
+        navigationController?.pushViewController(registerViewController, animated: true)
     }
 }

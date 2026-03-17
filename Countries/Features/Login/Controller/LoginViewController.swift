@@ -42,7 +42,9 @@ extension LoginViewController: LoginScreenDelegate {
     }
     
     func didTapLoginButton() {
-        print("Logando...")
+        let tabBarController = TabBarController()
+        view.window?.rootViewController = tabBarController
+        view.window?.makeKeyAndVisible()
     }
     
     func didTapRegisterButton() {

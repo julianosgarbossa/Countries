@@ -16,7 +16,7 @@ class TabBarController: UITabBarController {
     
     private func configViews() {
         let countries = createNavController(viewController: CountriesViewController(), title: "Países", imageName: "magnifyingglass")
-        let favorite = createNavController(viewController: UIViewController(), title: "Favoritos", imageName: "star")
+        let favorite = createNavController(viewController: FavoritesViewController(), title: "Favoritos", imageName: "star")
         let profile = createNavController(viewController: ProfileViewController(), title: "Perfil", imageName: "gear")
         
         viewControllers = [countries, favorite, profile]

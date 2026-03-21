@@ -121,7 +121,7 @@ class LoginScreen: UIView {
     private lazy var emailTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.placeholder = "exemplo@email.com"
+        textField.placeholder = "Informe seu email"
         textField.textColor = .black
         textField.font = UIFont.systemFont(ofSize: 16)
         textField.textAlignment = .left
@@ -156,7 +156,7 @@ class LoginScreen: UIView {
     private lazy var passwordTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.placeholder = "password"
+        textField.placeholder = "Informe sua senha"
         textField.textColor = .black
         textField.font = UIFont.systemFont(ofSize: 16)
         textField.textAlignment = .left

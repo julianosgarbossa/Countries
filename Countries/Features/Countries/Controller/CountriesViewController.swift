@@ -19,7 +19,7 @@ class CountriesViewController: UIViewController {
                                         Region(name: "Antártida"),
     ]
     private var countrieList: [Countrie] = [Countrie(name: "Brasil",
-                                                     capital: "Distrito Federal",
+                                                     capital: "Brasília",
                                                      region: Region(name: "América"),
                                                      flag: "br",
                                                      isFavorited: false),

@@ -27,7 +27,7 @@ class CountriesScreen: UIView {
         layout.minimumInteritemSpacing = 10
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.register(RegionCollectionViewCell.self, forCellWithReuseIdentifier: RegionCollectionViewCell.identifier)
+        collectionView.register(ContinentCollectionViewCell.self, forCellWithReuseIdentifier: ContinentCollectionViewCell.identifier)
         collectionView.backgroundColor = .clear
         collectionView.showsHorizontalScrollIndicator = false
         return collectionView

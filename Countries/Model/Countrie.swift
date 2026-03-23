@@ -11,6 +11,10 @@ struct Countrie {
     let name: String
     let capital: String
     let region: Region
+    let continent: Continent
+    let area: String
+    let population: String
+    let coin: String
     let flag: String
     var isFavorited: Bool
 }

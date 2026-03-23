@@ -1,5 +1,5 @@
 //
-//  RegionCollectionViewCell.swift
+//  ContinentCollectionViewCell.swift
 //  Countries
 //
 //  Created by Juliano Sgarbossa on 18/03/26.
@@ -7,14 +7,14 @@
 
 import UIKit
 
-class RegionCollectionViewCell: UICollectionViewCell {
+class ContinentCollectionViewCell: UICollectionViewCell {
     
-    static let identifier: String = String(describing: RegionCollectionViewCell.self)
+    static let identifier: String = String(describing: ContinentCollectionViewCell.self)
     static let heightCell: CGFloat = 40
     static let labelFont = UIFont.systemFont(ofSize: 16, weight: .semibold)
     
-    private lazy var regionCollectionViewCellSreen: RegionCollectionViewCellScreen = {
-        let view = RegionCollectionViewCellScreen()
+    private lazy var continentCollectionViewCellSreen: ContinentCollectionViewCellScreen = {
+        let view = ContinentCollectionViewCellScreen()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.layer.cornerRadius = 20
         view.clipsToBounds = true
@@ -31,23 +31,23 @@ class RegionCollectionViewCell: UICollectionViewCell {
     }
     
     private func addVisualElements() {
-        contentView.addSubview(regionCollectionViewCellSreen)
+        contentView.addSubview(continentCollectionViewCellSreen)
         
         configConstraints()
     }
     
     private func configConstraints() {
         NSLayoutConstraint.activate([
-            regionCollectionViewCellSreen.topAnchor.constraint(equalTo: contentView.topAnchor),
-            regionCollectionViewCellSreen.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            regionCollectionViewCellSreen.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            regionCollectionViewCellSreen.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+            continentCollectionViewCellSreen.topAnchor.constraint(equalTo: contentView.topAnchor),
+            continentCollectionViewCellSreen.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            continentCollectionViewCellSreen.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            continentCollectionViewCellSreen.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         ])
     }
     
-    func setupCell(region: Region) {
-        regionCollectionViewCellSreen.regionNameLabel.text = region.name
-        regionCollectionViewCellSreen.regionNameLabel.textColor = region.isSelected ? UIColor(red: 253/255, green: 155/255, blue: 1/255, alpha: 1) : UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
+    func setupCell(continent: Continent) {
+        continentCollectionViewCellSreen.continentNameLabel.text = continent.name
+        continentCollectionViewCellSreen.continentNameLabel.textColor = continent.isSelected ? UIColor(red: 253/255, green: 155/255, blue: 1/255, alpha: 1) : UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
     }
     
     static func calculateSize(title: String) -> CGSize {

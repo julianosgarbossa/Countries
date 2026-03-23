@@ -10,44 +10,68 @@ import UIKit
 class CountriesViewController: UIViewController {
     
     private var countriesScreen: CountriesScreen?
-    private var regionList: [Region] = [Region(name: "Todas", isSelected: true),
-                                        Region(name: "África"),
-                                        Region(name: "América"),
-                                        Region(name: "Ásia"),
-                                        Region(name: "Europa"),
-                                        Region(name: "Oceania"),
-                                        Region(name: "Antártida"),
+    private var continentList: [Continent] = [Continent(name: "Todas", isSelected: true),
+                                              Continent(name: "África"),
+                                              Continent(name: "América"),
+                                              Continent(name: "Ásia"),
+                                              Continent(name: "Europa"),
+                                              Continent(name: "Oceania"),
+                                              Continent(name: "Antártida"),
     ]
     private var countrieList: [Countrie] = [Countrie(name: "Brasil",
                                                      capital: "Brasília",
-                                                     region: Region(name: "América"),
+                                                     region: Region(name: "América do Sul"),
+                                                     continent: Continent(name: "América"),
+                                                     area: "8.515.767",
+                                                     population: "213.421.037",
+                                                     coin: "R$",
                                                      flag: "br",
                                                      isFavorited: false),
                                             Countrie(name: "Argentina",
-                                                      capital: "Buenos Aires",
-                                                      region: Region(name: "América"),
-                                                      flag: "ar",
-                                                      isFavorited: false),
+                                                    capital: "Buenos Aires",
+                                                     region: Region(name: "América do Sul"),
+                                                     continent: Continent(name: "América"),
+                                                     area: "2.780.400",
+                                                     population: "45.808.747",
+                                                     coin: "$",
+                                                     flag: "ar",
+                                                     isFavorited: false),
                                             Countrie(name: "Canadá",
-                                                      capital: "Ottawa",
-                                                      region: Region(name: "América"),
-                                                      flag: "ca",
-                                                      isFavorited: false),
+                                                     capital: "Ottawa",
+                                                     region: Region(name: "América do Norte"),
+                                                     continent: Continent(name: "América"),
+                                                     area: "9.984.670",
+                                                     population: "38.246.108",
+                                                     coin: "$",
+                                                     flag: "ca",
+                                                     isFavorited: false),
                                             Countrie(name: "Espanha",
-                                                      capital: "Madrid",
-                                                      region: Region(name: "Europa"),
-                                                      flag: "es",
-                                                      isFavorited: false),
+                                                     capital: "Madrid",
+                                                     region: Region(name: "Europa Ocidental"),
+                                                     continent: Continent(name: "Europa"),
+                                                     area: "505.990",
+                                                     population: "47.615.034",
+                                                     coin: "€",
+                                                     flag: "es",
+                                                     isFavorited: false),
                                             Countrie(name: "Itália",
-                                                      capital: "Roma",
-                                                      region: Region(name: "Europa"),
-                                                      flag: "it",
-                                                      isFavorited: false),
+                                                     capital: "Roma",
+                                                     region: Region(name: "Europa Meridional"),
+                                                     continent: Continent(name: "Europa"),
+                                                     area: "301.340",
+                                                     population: "58.870.762",
+                                                     coin: "€",
+                                                     flag: "it",
+                                                     isFavorited: false),
                                             Countrie(name: "Japão",
-                                                      capital: "Tokyo",
-                                                      region: Region(name: "Ásia"),
-                                                      flag: "jp",
-                                                      isFavorited: false),
+                                                     capital: "Tokyo",
+                                                     region: Region(name: "Leste Asiático"),
+                                                     continent: Continent(name: "Ásia"),
+                                                     area: "377.975",
+                                                     population: "125.836.021",
+                                                     coin: "¥",
+                                                     flag: "jp",
+                                                     isFavorited: false)
     ]
     
     private var selectedIndex: Int = 0
@@ -56,7 +80,7 @@ class CountriesViewController: UIViewController {
         countriesScreen = CountriesScreen()
         view = countriesScreen
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configProtocols()
@@ -89,8 +113,8 @@ extension CountriesViewController: UICollectionViewDelegate {
         
         let previousIndexPath = IndexPath(item: selectedIndex, section: indexPath.section)
         
-        regionList[selectedIndex].isSelected = false
-        regionList[indexPath.item].isSelected = true
+        continentList[selectedIndex].isSelected = false
+        continentList[indexPath.item].isSelected = true
         selectedIndex = indexPath.item
         
         collectionView.reloadItems(at: [previousIndexPath, indexPath])
@@ -99,25 +123,26 @@ extension CountriesViewController: UICollectionViewDelegate {
 
 extension CountriesViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return regionList.count
+        return continentList.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: RegionCollectionViewCell.identifier, for: indexPath) as? RegionCollectionViewCell else { return UICollectionViewCell() }
-        cell.setupCell(region: regionList[indexPath.item])
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ContinentCollectionViewCell.identifier, for: indexPath) as? ContinentCollectionViewCell else { return UICollectionViewCell() }
+        cell.setupCell(continent: continentList[indexPath.item])
         return cell
     }
 }
 
 extension CountriesViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return RegionCollectionViewCell.calculateSize(title: regionList[indexPath.item].name)
+        return ContinentCollectionViewCell.calculateSize(title: continentList[indexPath.item].name)
     }
 }
 
 extension CountriesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("Navegar para tela de detalhes do país: \(countrieList[indexPath.row].name)")
+        let countrieDetailViewController = CountrieDetailViewController(countrie: countrieList[indexPath.row])
+        navigationController?.pushViewController(countrieDetailViewController, animated: true)
     }
 }
 

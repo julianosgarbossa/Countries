@@ -9,5 +9,4 @@ import Foundation
 
 struct Region {
     let name: String
-    var isSelected: Bool = false
 }

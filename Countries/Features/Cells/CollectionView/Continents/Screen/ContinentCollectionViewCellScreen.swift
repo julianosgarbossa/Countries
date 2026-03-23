@@ -1,5 +1,5 @@
 //
-//  RegionCollectionViewCellScreen.swift
+//  ContinentCollectionViewCellScreen.swift
 //  Countries
 //
 //  Created by Juliano Sgarbossa on 18/03/26.
@@ -7,9 +7,9 @@
 
 import UIKit
 
-class RegionCollectionViewCellScreen: UIView {
+class ContinentCollectionViewCellScreen: UIView {
     
-    lazy var regionNameLabel: UILabel = {
+    lazy var continentNameLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
@@ -31,15 +31,15 @@ class RegionCollectionViewCellScreen: UIView {
     private func addVisualElements() {
         backgroundColor = .white
         
-        addSubview(regionNameLabel)
+        addSubview(continentNameLabel)
         
         configConstraints()
     }
     
     private func configConstraints() {
         NSLayoutConstraint.activate([
-            regionNameLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-            regionNameLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
+            continentNameLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+            continentNameLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
         ])
     }
 }

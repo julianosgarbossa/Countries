@@ -164,15 +164,15 @@ class CountrieDetailScreen: UIView {
         return label
     }()
     
-    private lazy var bordersCollectionView: UICollectionView = {
+    lazy var bordersCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumInteritemSpacing = 12
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = .blue
+        collectionView.backgroundColor = .clear
         collectionView.showsHorizontalScrollIndicator = false
-//        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        collectionView.register(BorderCollectionViewCell.self, forCellWithReuseIdentifier: BorderCollectionViewCell.identifier)
         return collectionView
     }()
     
@@ -529,5 +529,10 @@ class CountrieDetailScreen: UIView {
 
         coinLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
         coinLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+    }
+    
+    func configCollectionView(delegate: UICollectionViewDelegate, dataSource: UICollectionViewDataSource) {
+        bordersCollectionView.delegate = delegate
+        bordersCollectionView.dataSource = dataSource
     }
 }

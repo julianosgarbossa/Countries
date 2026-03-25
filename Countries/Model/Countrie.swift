@@ -13,6 +13,8 @@ struct Countrie {
     let region: Region
     let continent: Continent
     let area: String
+    let borders: [String]
+    let languages: [String]
     let population: String
     let coin: String
     let flag: String

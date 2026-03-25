@@ -43,6 +43,7 @@ class CountrieDetailViewController: UIViewController {
     
     private func configProtocols() {
         countrieDetailScreen?.delegate(delegate: self)
+        countrieDetailScreen?.configCollectionView(delegate: self, dataSource: self)
     }
     
     func configDetailScreen() {
@@ -66,5 +67,30 @@ extension CountrieDetailViewController: CountrieDetailScreenDelegate {
     func didTapFavoriteButton() {
         countrie.isFavorited.toggle()
         configDetailScreen()
+    }
+}
+
+extension CountrieDetailViewController: UICollectionViewDelegate {
+    
+}
+
+extension CountrieDetailViewController: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return countrie.borders.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if collectionView == countrieDetailScreen?.bordersCollectionView {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BorderCollectionViewCell.identifier, for: indexPath) as? BorderCollectionViewCell else { return UICollectionViewCell() }
+            cell.setupCell(border: countrie.borders[indexPath.row])
+            return cell
+        }
+        return UICollectionViewCell()
+    }
+}
+
+extension CountrieDetailViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return BorderCollectionViewCell.calculateSize(title: countrie.borders[indexPath.row])
     }
 }

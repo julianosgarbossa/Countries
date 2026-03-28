@@ -51,7 +51,7 @@ class CountrieDetailViewController: UIViewController {
         countrieDetailScreen?.favoriteButton.setImage(UIImage(systemName: countrie.isFavorited ? "star.fill" : "star"), for: .normal)
         countrieDetailScreen?.favoriteButton.tintColor = countrie.isFavorited ? UIColor(red: 253/255, green: 155/255, blue: 1/255, alpha: 1) : UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
         countrieDetailScreen?.countrieNameLabel.text = countrie.name
-        countrieDetailScreen?.regionNameLabel.text = countrie.region.name
+        countrieDetailScreen?.continentNameLabel.text = countrie.continent.name
         countrieDetailScreen?.areaLabel.text = "Área: \(countrie.area) km²"
         countrieDetailScreen?.capitalLabel.text = countrie.capital
         countrieDetailScreen?.populationLabel.text = "\(countrie.population) pessoas"
@@ -76,11 +76,19 @@ extension CountrieDetailViewController: UICollectionViewDelegate {
 
 extension CountrieDetailViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if collectionView === countrieDetailScreen?.languagesCollectionView {
+            return countrie.languages.count
+        }
         return countrie.borders.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if collectionView == countrieDetailScreen?.bordersCollectionView {
+        if collectionView === countrieDetailScreen?.languagesCollectionView {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BorderCollectionViewCell.identifier, for: indexPath) as? BorderCollectionViewCell else { return UICollectionViewCell() }
+            cell.setupCell(border: countrie.languages[indexPath.row])
+            return cell
+        }
+        if collectionView === countrieDetailScreen?.bordersCollectionView {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BorderCollectionViewCell.identifier, for: indexPath) as? BorderCollectionViewCell else { return UICollectionViewCell() }
             cell.setupCell(border: countrie.borders[indexPath.row])
             return cell
@@ -91,6 +99,9 @@ extension CountrieDetailViewController: UICollectionViewDataSource {
 
 extension CountrieDetailViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        if collectionView === countrieDetailScreen?.languagesCollectionView {
+            return BorderCollectionViewCell.calculateSize(title: countrie.languages[indexPath.row])
+        }
         return BorderCollectionViewCell.calculateSize(title: countrie.borders[indexPath.row])
     }
 }

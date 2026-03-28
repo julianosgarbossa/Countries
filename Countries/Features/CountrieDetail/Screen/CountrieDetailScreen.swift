@@ -84,7 +84,7 @@ class CountrieDetailScreen: UIView {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = .white
-        view.layer.cornerRadius = 48
+        view.layer.cornerRadius = 40
         view.layer.maskedCorners = [
             .layerMinXMinYCorner,
             .layerMaxXMinYCorner
@@ -105,33 +105,36 @@ class CountrieDetailScreen: UIView {
         return label
     }()
     
-    private lazy var regionTitleLabel: UILabel = {
+    private lazy var continentTitleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Região:"
+        label.text = "Continente:"
         label.textColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
         label.textAlignment = .left
         label.numberOfLines = 1
-        label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        label.adjustsFontForContentSizeCategory = true
+        label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         return label
     }()
     
-    lazy var regionNameLabel: UILabel = {
+    lazy var continentNameLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
         label.textAlignment = .left
         label.numberOfLines = 1
-        label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
+        label.adjustsFontForContentSizeCategory = true
+        label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         return label
     }()
     
     private lazy var mapImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.image = UIImage(named: "map")
-        imageView.contentMode = .scaleToFill
-        imageView.layer.cornerRadius = 24
+        imageView.image = UIImage(named: "mockPais")
+        imageView.contentMode = .scaleAspectFill
+        imageView.backgroundColor = .clear
+        imageView.layer.cornerRadius = 18
         imageView.clipsToBounds = true
         return imageView
     }()
@@ -142,7 +145,8 @@ class CountrieDetailScreen: UIView {
         label.textColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
         label.textAlignment = .center
         label.numberOfLines = 1
-        label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
+        label.adjustsFontForContentSizeCategory = true
+        label.font = UIFont.systemFont(ofSize: 15, weight: .regular)
         return label
     }()
     
@@ -160,6 +164,7 @@ class CountrieDetailScreen: UIView {
         label.textColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
         label.textAlignment = .left
         label.numberOfLines = 1
+        label.adjustsFontForContentSizeCategory = true
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         return label
     }()
@@ -302,15 +307,15 @@ class CountrieDetailScreen: UIView {
         return label
     }()
     
-    private lazy var languagesCollectionView: UICollectionView = {
+    lazy var languagesCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumInteritemSpacing = 12
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = .blue
+        collectionView.backgroundColor = .clear
         collectionView.showsHorizontalScrollIndicator = false
-//        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        collectionView.register(BorderCollectionViewCell.self, forCellWithReuseIdentifier: BorderCollectionViewCell.identifier)
         return collectionView
     }()
     
@@ -350,8 +355,8 @@ class CountrieDetailScreen: UIView {
         blurView.contentView.addSubview(favoriteButton)
         contentView.addSubview(cardDetailtCountrieView)
         cardDetailtCountrieView.addSubview(countrieNameLabel)
-        cardDetailtCountrieView.addSubview(regionTitleLabel)
-        cardDetailtCountrieView.addSubview(regionNameLabel)
+        cardDetailtCountrieView.addSubview(continentTitleLabel)
+        cardDetailtCountrieView.addSubview(continentNameLabel)
         cardDetailtCountrieView.addSubview(mapImageView)
         cardDetailtCountrieView.addSubview(areaLabel)
         cardDetailtCountrieView.addSubview(contentScrollBottomView)
@@ -376,6 +381,14 @@ class CountrieDetailScreen: UIView {
     }
     
     private func configConstraints() {
+        let horizontalPadding: CGFloat = 16
+        let mapAspectFallback: NSLayoutConstraint = {
+            if let image = UIImage(named: "mockPais"), image.size.width > 0 {
+                return mapImageView.heightAnchor.constraint(equalTo: mapImageView.widthAnchor, multiplier: image.size.height / image.size.width)
+            }
+            return mapImageView.heightAnchor.constraint(equalToConstant: 200)
+        }()
+        
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -391,44 +404,43 @@ class CountrieDetailScreen: UIView {
             countrieFlagImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
             countrieFlagImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             countrieFlagImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            countrieFlagImageView.heightAnchor.constraint(equalToConstant: 200),
+            countrieFlagImageView.heightAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.42, constant: 0),
             
             blurView.topAnchor.constraint(equalTo: countrieFlagImageView.topAnchor),
             blurView.leadingAnchor.constraint(equalTo: countrieFlagImageView.leadingAnchor),
             blurView.trailingAnchor.constraint(equalTo: countrieFlagImageView.trailingAnchor),
             blurView.bottomAnchor.constraint(equalTo: countrieFlagImageView.bottomAnchor),
             
-            backButton.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 12),
-            backButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            backButton.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 8),
+            backButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: horizontalPadding),
             backButton.heightAnchor.constraint(equalToConstant: 38),
             backButton.widthAnchor.constraint(equalToConstant: 38),
             
-            favoriteButton.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 12),
-            favoriteButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            favoriteButton.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 8),
+            favoriteButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -horizontalPadding),
             favoriteButton.heightAnchor.constraint(equalTo: backButton.heightAnchor),
             favoriteButton.widthAnchor.constraint(equalTo: backButton.widthAnchor),
             
-            cardDetailtCountrieView.topAnchor.constraint(equalTo: backButton.bottomAnchor, constant: 12),
+            cardDetailtCountrieView.topAnchor.constraint(equalTo: countrieFlagImageView.bottomAnchor, constant: -44),
             cardDetailtCountrieView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             cardDetailtCountrieView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             cardDetailtCountrieView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-            cardDetailtCountrieView.heightAnchor.constraint(greaterThanOrEqualTo: scrollView.frameLayoutGuide.heightAnchor, constant: -60),
             
-            countrieNameLabel.topAnchor.constraint(equalTo: cardDetailtCountrieView.topAnchor, constant: 24),
-            countrieNameLabel.leadingAnchor.constraint(equalTo: cardDetailtCountrieView.leadingAnchor, constant: 16),
-            countrieNameLabel.trailingAnchor.constraint(equalTo: cardDetailtCountrieView.trailingAnchor, constant: -16),
+            countrieNameLabel.topAnchor.constraint(equalTo: cardDetailtCountrieView.topAnchor, constant: 28),
+            countrieNameLabel.leadingAnchor.constraint(equalTo: cardDetailtCountrieView.leadingAnchor, constant: horizontalPadding),
+            countrieNameLabel.trailingAnchor.constraint(equalTo: cardDetailtCountrieView.trailingAnchor, constant: -horizontalPadding),
             
-            regionTitleLabel.topAnchor.constraint(equalTo: countrieNameLabel.bottomAnchor, constant: 16),
-            regionTitleLabel.leadingAnchor.constraint(equalTo: countrieNameLabel.leadingAnchor),
+            continentTitleLabel.topAnchor.constraint(equalTo: countrieNameLabel.bottomAnchor, constant: 20),
+            continentTitleLabel.leadingAnchor.constraint(equalTo: countrieNameLabel.leadingAnchor),
             
-            regionNameLabel.centerYAnchor.constraint(equalTo: regionTitleLabel.centerYAnchor),
-            regionNameLabel.leadingAnchor.constraint(equalTo: regionTitleLabel.trailingAnchor, constant: 4),
-            regionNameLabel.trailingAnchor.constraint(equalTo: countrieNameLabel.trailingAnchor),
+            continentNameLabel.centerYAnchor.constraint(equalTo: continentTitleLabel.centerYAnchor),
+            continentNameLabel.leadingAnchor.constraint(equalTo: continentTitleLabel.trailingAnchor, constant: 4),
+            continentNameLabel.trailingAnchor.constraint(equalTo: countrieNameLabel.trailingAnchor),
             
-            mapImageView.topAnchor.constraint(equalTo: regionNameLabel.bottomAnchor, constant: 12),
+            mapImageView.topAnchor.constraint(equalTo: continentTitleLabel.bottomAnchor, constant: 20),
             mapImageView.leadingAnchor.constraint(equalTo: countrieNameLabel.leadingAnchor),
             mapImageView.trailingAnchor.constraint(equalTo: countrieNameLabel.trailingAnchor),
-            mapImageView.heightAnchor.constraint(equalToConstant: 160),
+            mapAspectFallback,
             
             areaLabel.topAnchor.constraint(equalTo: mapImageView.bottomAnchor, constant: 12),
             areaLabel.leadingAnchor.constraint(equalTo: countrieNameLabel.leadingAnchor),
@@ -506,11 +518,11 @@ class CountrieDetailScreen: UIView {
     }
     
     private func setupLayoutPriorities() {
-        regionTitleLabel.setContentHuggingPriority(.required, for: .horizontal)
-        regionTitleLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        continentTitleLabel.setContentHuggingPriority(.required, for: .horizontal)
+        continentTitleLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
 
-        regionNameLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        regionNameLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        continentNameLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        continentNameLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         
         capitalTitleLabel.setContentHuggingPriority(.required, for: .horizontal)
         capitalTitleLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -534,5 +546,7 @@ class CountrieDetailScreen: UIView {
     func configCollectionView(delegate: UICollectionViewDelegate, dataSource: UICollectionViewDataSource) {
         bordersCollectionView.delegate = delegate
         bordersCollectionView.dataSource = dataSource
+        languagesCollectionView.delegate = delegate
+        languagesCollectionView.dataSource = dataSource
     }
 }

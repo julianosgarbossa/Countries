@@ -449,7 +449,7 @@ class CountrieDetailScreen: UIView {
             bordersContentView.topAnchor.constraint(equalTo: areaLabel.bottomAnchor, constant: 12),
             bordersContentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             bordersContentView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            bordersContentView.heightAnchor.constraint(equalToConstant: 104),
+            bordersContentView.heightAnchor.constraint(equalToConstant: 112),
             
             bordersTitleLabel.topAnchor.constraint(equalTo: bordersContentView.topAnchor, constant: 12),
             bordersTitleLabel.leadingAnchor.constraint(equalTo: countrieNameLabel.leadingAnchor),
@@ -458,7 +458,7 @@ class CountrieDetailScreen: UIView {
             bordersCollectionView.topAnchor.constraint(equalTo: bordersTitleLabel.bottomAnchor, constant: 12),
             bordersCollectionView.leadingAnchor.constraint(equalTo: countrieNameLabel.leadingAnchor),
             bordersCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            bordersCollectionView.heightAnchor.constraint(equalToConstant: 48),
+            bordersCollectionView.heightAnchor.constraint(equalToConstant: BorderCollectionViewCell.countryBorderHeight),
             
             capitalImageView.topAnchor.constraint(equalTo: bordersContentView.bottomAnchor, constant: 12),
             capitalImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
@@ -499,7 +499,7 @@ class CountrieDetailScreen: UIView {
             languagesContentView.topAnchor.constraint(equalTo: coinImageView.bottomAnchor, constant: 12),
             languagesContentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             languagesContentView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            languagesContentView.heightAnchor.constraint(equalTo: bordersContentView.heightAnchor),
+            languagesContentView.heightAnchor.constraint(equalToConstant: 104),
             
             languagesTitleLabel.topAnchor.constraint(equalTo: languagesContentView.topAnchor, constant: 12),
             languagesTitleLabel.leadingAnchor.constraint(equalTo: countrieNameLabel.leadingAnchor),
@@ -508,7 +508,7 @@ class CountrieDetailScreen: UIView {
             languagesCollectionView.topAnchor.constraint(equalTo: languagesTitleLabel.bottomAnchor, constant: 12),
             languagesCollectionView.leadingAnchor.constraint(equalTo: countrieNameLabel.leadingAnchor),
             languagesCollectionView.trailingAnchor.constraint(equalTo: bordersCollectionView.trailingAnchor),
-            languagesCollectionView.heightAnchor.constraint(equalTo: bordersCollectionView.heightAnchor),
+            languagesCollectionView.heightAnchor.constraint(equalToConstant: BorderCollectionViewCell.languageHeight),
             
             contentScrollBottomView.topAnchor.constraint(equalTo: languagesContentView.bottomAnchor),
             contentScrollBottomView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
@@ -548,5 +548,10 @@ class CountrieDetailScreen: UIView {
         bordersCollectionView.dataSource = dataSource
         languagesCollectionView.delegate = delegate
         languagesCollectionView.dataSource = dataSource
+    }
+
+    func setScrollBottomInset(_ inset: CGFloat) {
+        scrollView.contentInset.bottom = inset
+        scrollView.verticalScrollIndicatorInsets.bottom = inset
     }
 }

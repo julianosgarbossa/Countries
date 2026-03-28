@@ -37,6 +37,11 @@ class CountrieDetailViewController: UIViewController {
         configNavigationControler()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        countrieDetailScreen?.setScrollBottomInset(view.safeAreaInsets.bottom)
+    }
+    
     private func configNavigationControler() {
         navigationController?.navigationBar.isHidden = true
     }
@@ -85,7 +90,7 @@ extension CountrieDetailViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView === countrieDetailScreen?.languagesCollectionView {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BorderCollectionViewCell.identifier, for: indexPath) as? BorderCollectionViewCell else { return UICollectionViewCell() }
-            cell.setupCell(border: countrie.languages[indexPath.row])
+            cell.setupCell(language: countrie.languages[indexPath.row])
             return cell
         }
         if collectionView === countrieDetailScreen?.bordersCollectionView {
@@ -100,8 +105,8 @@ extension CountrieDetailViewController: UICollectionViewDataSource {
 extension CountrieDetailViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         if collectionView === countrieDetailScreen?.languagesCollectionView {
-            return BorderCollectionViewCell.calculateSize(title: countrie.languages[indexPath.row])
+            return BorderCollectionViewCell.calculateSize(title: countrie.languages[indexPath.row], variant: .language)
         }
-        return BorderCollectionViewCell.calculateSize(title: countrie.borders[indexPath.row])
+        return BorderCollectionViewCell.calculateSize(title: countrie.borders[indexPath.row], variant: .countryBorder)
     }
 }

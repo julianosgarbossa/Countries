@@ -66,7 +66,7 @@ class PasswordRecoveryScreen: UIView {
         return label
     }()
     
-    private lazy var emailTextField: UITextField = {
+    lazy var emailTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.placeholder = "Informe seu email"
@@ -103,6 +103,8 @@ class PasswordRecoveryScreen: UIView {
         button.layer.cornerRadius = 24
         button.clipsToBounds = true
         button.addTarget(self, action: #selector(didTapSendRecoveryLinkButton), for: .touchUpInside)
+        button.isEnabled = false
+        button.alpha = 0.5
         return button
     }()
     
@@ -161,5 +163,14 @@ class PasswordRecoveryScreen: UIView {
             sendRecoveryLinkButton.trailingAnchor.constraint(equalTo: descriptionPasswordRecoveryLabel.trailingAnchor),
             sendRecoveryLinkButton.heightAnchor.constraint(equalTo: emailTextField.heightAnchor),
         ])
+    }
+    
+    func configTextField(delegate: UITextFieldDelegate) {
+        emailTextField.delegate = delegate
+    }
+    
+    func setSendRecoveryLinkButtonEnabled(_ enabled: Bool) {
+        sendRecoveryLinkButton.isEnabled = enabled
+        sendRecoveryLinkButton.alpha = enabled ? 1.0 : 0.5
     }
 }

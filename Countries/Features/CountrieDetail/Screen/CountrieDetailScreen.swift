@@ -40,6 +40,7 @@ class CountrieDetailScreen: UIView {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFill
         imageView.isUserInteractionEnabled = true
+        imageView.clipsToBounds = true
         return imageView
     }()
     
@@ -48,7 +49,6 @@ class CountrieDetailScreen: UIView {
         let blurView = UIVisualEffectView(effect: blurEffect)
         blurView.translatesAutoresizingMaskIntoConstraints = false
         blurView.alpha = 0.85
-        blurView.layer.cornerRadius = 35
         blurView.clipsToBounds = true
         return blurView
     }()
@@ -411,13 +411,13 @@ class CountrieDetailScreen: UIView {
             blurView.trailingAnchor.constraint(equalTo: countrieFlagImageView.trailingAnchor),
             blurView.bottomAnchor.constraint(equalTo: countrieFlagImageView.bottomAnchor),
             
-            backButton.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 8),
-            backButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: horizontalPadding),
+            backButton.topAnchor.constraint(equalTo: blurView.safeAreaLayoutGuide.topAnchor, constant: 8),
+            backButton.leadingAnchor.constraint(equalTo: blurView.leadingAnchor, constant: horizontalPadding),
             backButton.heightAnchor.constraint(equalToConstant: 38),
             backButton.widthAnchor.constraint(equalToConstant: 38),
             
-            favoriteButton.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 8),
-            favoriteButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -horizontalPadding),
+            favoriteButton.topAnchor.constraint(equalTo: blurView.safeAreaLayoutGuide.topAnchor, constant: 8),
+            favoriteButton.trailingAnchor.constraint(equalTo: blurView.trailingAnchor, constant: -horizontalPadding),
             favoriteButton.heightAnchor.constraint(equalTo: backButton.heightAnchor),
             favoriteButton.widthAnchor.constraint(equalTo: backButton.widthAnchor),
             

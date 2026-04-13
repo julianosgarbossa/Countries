@@ -38,7 +38,8 @@ class LoginViewController: UIViewController {
 
 extension LoginViewController: LoginScreenDelegate {
     func didTapRecoverPasswordButton() {
-        print("Recuperando Senha....")
+        let passwordRecoveryViewController = PasswordRecoveryViewController()
+        navigationController?.pushViewController(passwordRecoveryViewController, animated: true)
     }
     
     func didTapLoginButton() {

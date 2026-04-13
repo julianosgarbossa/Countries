@@ -118,7 +118,7 @@ class LoginScreen: UIView {
         return label
     }()
     
-    private lazy var emailTextField: UITextField = {
+    lazy var emailTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.placeholder = "Informe seu email"
@@ -153,7 +153,7 @@ class LoginScreen: UIView {
         return label
     }()
     
-    private lazy var passwordTextField: UITextField = {
+    lazy var passwordTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.placeholder = "Informe sua senha"
@@ -202,6 +202,8 @@ class LoginScreen: UIView {
         button.layer.cornerRadius = 24
         button.clipsToBounds = true
         button.addTarget(self, action: #selector(didTapLoginButton), for: .touchUpInside)
+        button.isEnabled = false
+        button.alpha = 0.5
         return button
     }()
     
@@ -365,5 +367,15 @@ class LoginScreen: UIView {
         let spacerMinHeight = bottomSpacerView.heightAnchor.constraint(greaterThanOrEqualToConstant: 44)
         spacerMinHeight.priority = .defaultLow
         spacerMinHeight.isActive = true
+    }
+    
+    func configTextField(delegate: UITextFieldDelegate) {
+        emailTextField.delegate = delegate
+        passwordTextField.delegate = delegate
+    }
+    
+    func setLoginButtonEnabled(_ enabled: Bool) {
+        loginButton.isEnabled = enabled
+        loginButton.alpha = enabled ? 1.0 : 0.5
     }
 }

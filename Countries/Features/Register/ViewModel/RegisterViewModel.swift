@@ -9,7 +9,7 @@ import Foundation
 
 protocol RegisterViewModelDelegate: AnyObject {
     func didUpdateFormVaidity(isValid: Bool)
-    func didValidateField(field: RegisterViewModel.FieldType, isValid: Bool)
+    func didValidateField(field: RegisterViewModel.RegisterFieldType, isValid: Bool)
     func didRegisterSuccess()
 }
 
@@ -17,7 +17,7 @@ final class RegisterViewModel {
     
     weak var delegate: RegisterViewModelDelegate?
     
-    enum FieldType {
+    enum RegisterFieldType {
         case name
         case email
         case password
@@ -29,7 +29,7 @@ final class RegisterViewModel {
     private var password: String?
     private var confirmPassword: String?
     
-    func updateField(field: FieldType, value: String?) {
+    func updateField(field: RegisterFieldType, value: String?) {
         switch field {
         case .name:
             name = value

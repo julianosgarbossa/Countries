@@ -36,14 +36,6 @@ class RegisterViewController: UIViewController {
     private func configNavigationControler() {
         navigationController?.navigationBar.isHidden = false
     }
-    
-    private func textAfterChange(in textField: UITextField, range: NSRange, replacementString string: String) -> String {
-        let currentText = textField.text ?? ""
-        guard let stringRange = Range(range, in: currentText) else {
-            return currentText
-        }
-        return currentText.replacingCharacters(in: stringRange, with: string)
-    }
 }
 
 extension RegisterViewController: UITextFieldDelegate {
@@ -51,17 +43,17 @@ extension RegisterViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard let registerScreen else { return true }
 
-        let updatedText = textAfterChange(in: textField, range: range, replacementString: string)
+        let textAfterChange = (textField.text ?? "").applyingReplacement(range: range, with: string)
 
         switch textField {
         case registerScreen.nameTextField:
-            registerViewModel.updateField(field: .name, value: updatedText)
+            registerViewModel.updateField(field: .name, value: textAfterChange)
         case registerScreen.emailTextField:
-            registerViewModel.updateField(field: .email, value: updatedText)
+            registerViewModel.updateField(field: .email, value: textAfterChange)
         case registerScreen.passwordTextField:
-            registerViewModel.updateField(field: .password, value: updatedText)
+            registerViewModel.updateField(field: .password, value: textAfterChange)
         case registerScreen.confirmPasswordTextField:
-            registerViewModel.updateField(field: .confirmPassword, value: updatedText)
+            registerViewModel.updateField(field: .confirmPassword, value: textAfterChange)
         default:
             return true
         }
@@ -97,7 +89,7 @@ extension RegisterViewController: RegisterViewModelDelegate {
         registerScreen?.setRegisterButtonEnabled(isValid)
     }
     
-    func didValidateField(field: RegisterViewModel.FieldType, isValid: Bool) {
+    func didValidateField(field: RegisterViewModel.RegisterFieldType, isValid: Bool) {
         guard let registerScreen = registerScreen else { return }
                 let textField: UITextField
         

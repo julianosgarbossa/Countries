@@ -41,7 +41,8 @@ class CountriesViewController: UIViewController {
 
 extension CountriesViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        print(searchText)
+        countriesViewModel.searchCountries(with: searchText)
+        countriesScreen?.countriesTableView.reloadData()
     }
 }
 
@@ -66,14 +67,15 @@ extension CountriesViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ContinentCollectionViewCell.identifier, for: indexPath) as? ContinentCollectionViewCell else { return UICollectionViewCell() }
-        cell.setupCell(continent: countriesViewModel.continent(at: indexPath.row))
+        cell.setupCell(continent: countriesViewModel.continent(at: indexPath.item))
         return cell
     }
 }
 
 extension CountriesViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return ContinentCollectionViewCell.calculateSize(title: countriesViewModel.continent(at: indexPath.row).name)
+        let continent = countriesViewModel.continent(at: indexPath.item)
+        return ContinentCollectionViewCell.calculateSize(title: continent.name)
     }
 }
 
@@ -97,7 +99,7 @@ extension CountriesViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return countriesViewModel.heightForRowAt
+        return CountrieTableViewCell.heightForRowAt
     }
 }
 

@@ -12,8 +12,6 @@ class CountriesViewController: UIViewController {
     private var countriesScreen: CountriesScreen?
     private let countriesViewModel = CountriesViewModel()
     
-//    private var selectedIndex: Int = 0
-    
     override func loadView() {
         countriesScreen = CountriesScreen()
         view = countriesScreen
@@ -37,12 +35,22 @@ class CountriesViewController: UIViewController {
         countriesScreen?.configCollectionView(delegate: self, dataSource: self)
         countriesScreen?.configTableView(delegate: self, dataSource: self)
     }
+    
+    private func updateCountriesListUI() {
+        countriesScreen?.countriesTableView.reloadData()
+        
+        if countriesViewModel.shouldShowEmptyState {
+            countriesScreen?.showEmptyState(message: countriesViewModel.emptyStateMessage)
+        } else {
+            countriesScreen?.hideEmptyState()
+        }
+    }
 }
 
 extension CountriesViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         countriesViewModel.searchCountries(with: searchText)
-        countriesScreen?.countriesTableView.reloadData()
+        updateCountriesListUI()
     }
 }
 
@@ -54,7 +62,7 @@ extension CountriesViewController: UICollectionViewDelegate {
          let newIndexPath = IndexPath(item: update.newIndex, section: indexPath.section)
          
          collectionView.reloadItems(at: [oldIndexPath, newIndexPath])
-         countriesScreen?.countriesTableView.reloadData()
+         updateCountriesListUI()
     }
 }
 

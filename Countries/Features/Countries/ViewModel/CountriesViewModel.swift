@@ -150,6 +150,23 @@ final class CountriesViewModel {
         continentList.count
     }
     
+    var shouldShowEmptyState: Bool {
+        filteredCountries.isEmpty
+    }
+    
+    var emptyStateMessage: String {
+        if !currentSearchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return "Ops! Nenhum país chamado \(currentSearchText) foi encontrado, tente novamente!"
+        }
+        
+        let selectedContinent = continent(at: selectedContinentIndex).name
+        if selectedContinent != "Todas" {
+            return "Nenhum país encontrado para o continente selecionado."
+        }
+        
+        return "Nenhum país encontrado."
+    }
+    
     func country(at index: Int) -> Countrie {
         return filteredCountries[index]
     }

@@ -48,15 +48,13 @@ extension CountriesViewController: UISearchBarDelegate {
 
 extension CountriesViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        guard selectedIndex != indexPath.item else { return }
-//        
-//        let previousIndexPath = IndexPath(item: selectedIndex, section: indexPath.section)
-//        
-//        continentList[selectedIndex].isSelected = false
-//        continentList[indexPath.item].isSelected = true
-//        selectedIndex = indexPath.item
-//        
-//        collectionView.reloadItems(at: [previousIndexPath, indexPath])
+        guard let update = countriesViewModel.didSelectContinent(at: indexPath.item) else { return }
+         
+         let oldIndexPath = IndexPath(item: update.oldIndex, section: indexPath.section)
+         let newIndexPath = IndexPath(item: update.newIndex, section: indexPath.section)
+         
+         collectionView.reloadItems(at: [oldIndexPath, newIndexPath])
+         countriesScreen?.countriesTableView.reloadData()
     }
 }
 

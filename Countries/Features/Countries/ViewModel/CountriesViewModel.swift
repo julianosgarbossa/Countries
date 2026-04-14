@@ -39,7 +39,7 @@ final class CountriesViewModel {
                                                      flag: "br",
                                                      isFavorited: false),
                                             Countrie(name: "Argentina",
-                                                    capital: "Buenos Aires",
+                                                     capital: "Buenos Aires",
                                                      region: Region(name: "América do Sul"),
                                                      continent: Continent(name: "América"),
                                                      area: "2.780.400",
@@ -110,9 +110,36 @@ final class CountriesViewModel {
     ]
     
     private var filteredCountries: [Countrie] = []
+    private var currentSearchText: String = ""
+    private var selectedContinentIndex: Int = 0
     
     init() {
         self.filteredCountries = countrieList
+    }
+    
+    private func applyFilters() {
+        var result = countrieList
+        
+        let selectedContinent = continent(at: selectedContinentIndex).name
+        
+        if selectedContinent != "Todas" {
+            result = result.filter { $0.continent.name == selectedContinent }
+        }
+        
+        let search = currentSearchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if !search.isEmpty {
+            result = result.filter {
+                $0.name.localizedCaseInsensitiveContains(search)
+            }
+        }
+        
+        filteredCountries = result
+    }
+    
+    private func applyContinentSelection(oldIndex: Int, newIndex: Int) {
+        continentList[oldIndex].isSelected = false
+        continentList[newIndex].isSelected = true
     }
     
     var numberOfRowsInSection: Int {
@@ -136,15 +163,19 @@ final class CountriesViewModel {
     }
     
     func searchCountries(with text: String) {
-        let searchText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        currentSearchText = text
+        applyFilters()
+    }
+    
+    func didSelectContinent(at index: Int) -> (oldIndex: Int, newIndex: Int)? {
+        guard selectedContinentIndex != index else { return nil }
         
-        guard !searchText.isEmpty else {
-            filteredCountries = countrieList
-            return
-        }
+        let oldIndex = selectedContinentIndex
+        selectedContinentIndex = index
         
-        filteredCountries = countrieList.filter {
-            $0.name.localizedCaseInsensitiveContains(searchText)
-        }
+        applyContinentSelection(oldIndex: oldIndex, newIndex: index)
+        applyFilters()
+        
+        return (oldIndex, index)
     }
 }

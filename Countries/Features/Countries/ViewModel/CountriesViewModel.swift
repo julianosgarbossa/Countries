@@ -109,27 +109,42 @@ final class CountriesViewModel {
                                                      isFavorited: false)
     ]
     
+    private var filteredCountries: [Countrie] = []
+    
+    init() {
+        self.filteredCountries = countrieList
+    }
+    
     var numberOfRowsInSection: Int {
-        countrieList.count
+        filteredCountries.count
     }
     
     var numberOfItemsInSection: Int {
         continentList.count
     }
     
-    var heightForRowAt: CGFloat {
-        return 106
-    }
-    
     func country(at index: Int) -> Countrie {
-        return countrieList[index]
+        return filteredCountries[index]
     }
     
     func toggleFavorite(at index: Int) {
-        countrieList[index].isFavorited.toggle()
+        filteredCountries[index].isFavorited.toggle()
     }
     
     func continent(at index: Int) -> Continent {
         return continentList[index]
+    }
+    
+    func searchCountries(with text: String) {
+        let searchText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard !searchText.isEmpty else {
+            filteredCountries = countrieList
+            return
+        }
+        
+        filteredCountries = countrieList.filter {
+            $0.name.localizedCaseInsensitiveContains(searchText)
+        }
     }
 }

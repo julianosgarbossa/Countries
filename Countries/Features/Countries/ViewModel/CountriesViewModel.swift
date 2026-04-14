@@ -9,6 +9,15 @@ import Foundation
 
 final class CountriesViewModel {
     
+    private var continentList: [Continent] = [Continent(name: "Todas", isSelected: true),
+                                              Continent(name: "África"),
+                                              Continent(name: "América"),
+                                              Continent(name: "Ásia"),
+                                              Continent(name: "Europa"),
+                                              Continent(name: "Oceania"),
+                                              Continent(name: "Antártida"),
+    ]
+    
     private var countrieList: [Countrie] = [Countrie(name: "Brasil",
                                                      capital: "Brasília",
                                                      region: Region(name: "América do Sul"),
@@ -104,6 +113,10 @@ final class CountriesViewModel {
         countrieList.count
     }
     
+    var numberOfItemsInSection: Int {
+        continentList.count
+    }
+    
     var heightForRowAt: CGFloat {
         return 106
     }
@@ -114,5 +127,9 @@ final class CountriesViewModel {
     
     func toggleFavorite(at index: Int) {
         countrieList[index].isFavorited.toggle()
+    }
+    
+    func continent(at index: Int) -> Continent {
+        return continentList[index]
     }
 }

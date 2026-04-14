@@ -12,16 +12,7 @@ class CountriesViewController: UIViewController {
     private var countriesScreen: CountriesScreen?
     private let countriesViewModel = CountriesViewModel()
     
-    private var selectedIndex: Int = 0
-    
-    private var continentList: [Continent] = [Continent(name: "Todas", isSelected: true),
-                                              Continent(name: "África"),
-                                              Continent(name: "América"),
-                                              Continent(name: "Ásia"),
-                                              Continent(name: "Europa"),
-                                              Continent(name: "Oceania"),
-                                              Continent(name: "Antártida"),
-    ]
+//    private var selectedIndex: Int = 0
     
     override func loadView() {
         countriesScreen = CountriesScreen()
@@ -56,33 +47,33 @@ extension CountriesViewController: UISearchBarDelegate {
 
 extension CountriesViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard selectedIndex != indexPath.item else { return }
-        
-        let previousIndexPath = IndexPath(item: selectedIndex, section: indexPath.section)
-        
-        continentList[selectedIndex].isSelected = false
-        continentList[indexPath.item].isSelected = true
-        selectedIndex = indexPath.item
-        
-        collectionView.reloadItems(at: [previousIndexPath, indexPath])
+//        guard selectedIndex != indexPath.item else { return }
+//        
+//        let previousIndexPath = IndexPath(item: selectedIndex, section: indexPath.section)
+//        
+//        continentList[selectedIndex].isSelected = false
+//        continentList[indexPath.item].isSelected = true
+//        selectedIndex = indexPath.item
+//        
+//        collectionView.reloadItems(at: [previousIndexPath, indexPath])
     }
 }
 
 extension CountriesViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return continentList.count
+        return countriesViewModel.numberOfItemsInSection
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ContinentCollectionViewCell.identifier, for: indexPath) as? ContinentCollectionViewCell else { return UICollectionViewCell() }
-        cell.setupCell(continent: continentList[indexPath.item])
+        cell.setupCell(continent: countriesViewModel.continent(at: indexPath.row))
         return cell
     }
 }
 
 extension CountriesViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return ContinentCollectionViewCell.calculateSize(title: continentList[indexPath.item].name)
+        return ContinentCollectionViewCell.calculateSize(title: countriesViewModel.continent(at: indexPath.row).name)
     }
 }
 

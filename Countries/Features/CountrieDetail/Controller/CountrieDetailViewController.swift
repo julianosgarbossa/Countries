@@ -9,10 +9,10 @@ import UIKit
 
 class CountrieDetailViewController: UIViewController {
     
-    private var countrie: Countrie
+    private var countrie: Country
     private var countrieDetailScreen: CountrieDetailScreen?
     
-    init(countrie: Countrie) {
+    init(countrie: Country) {
         self.countrie = countrie
         super.init(nibName: nil, bundle: nil)
     }

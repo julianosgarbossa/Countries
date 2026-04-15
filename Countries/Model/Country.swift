@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Countrie {
+struct Country {
     let name: String
     let capital: String
     let region: Region

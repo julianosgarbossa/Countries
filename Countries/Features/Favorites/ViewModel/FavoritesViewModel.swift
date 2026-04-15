@@ -1,24 +1,14 @@
 //
-//  CountriesViewModel.swift
+//  FavoritesViewModel.swift
 //  Countries
 //
-//  Created by Juliano Sgarbossa on 14/04/26.
+//  Created by Juliano Sgarbossa on 15/04/26.
 //
 
 import Foundation
 
-final class CountriesViewModel {
-    
-    private var continentList: [Continent] = [Continent(name: "Todas", isSelected: true),
-                                              Continent(name: "África"),
-                                              Continent(name: "América"),
-                                              Continent(name: "Ásia"),
-                                              Continent(name: "Europa"),
-                                              Continent(name: "Oceania"),
-                                              Continent(name: "Antártida"),
-    ]
-    
-    private var countrieList: [Country] = [Country(name: "Brasil",
+final class FavoritesViewModel {
+    private var countryFavoriteList: [Country] = [Country(name: "Brasil",
                                                      capital: "Brasília",
                                                      region: Region(name: "América do Sul"),
                                                      continent: Continent(name: "América"),
@@ -37,9 +27,9 @@ final class CountriesViewModel {
                                                      population: "213.421.037",
                                                      coin: "R$",
                                                      flag: "br",
-                                                     isFavorited: false),
+                                                     isFavorited: true),
                                             Country(name: "Argentina",
-                                                     capital: "Buenos Aires",
+                                                    capital: "Buenos Aires",
                                                      region: Region(name: "América do Sul"),
                                                      continent: Continent(name: "América"),
                                                      area: "2.780.400",
@@ -53,7 +43,7 @@ final class CountriesViewModel {
                                                      population: "45.808.747",
                                                      coin: "$",
                                                      flag: "ar",
-                                                     isFavorited: false),
+                                                     isFavorited: true),
                                             Country(name: "Canadá",
                                                      capital: "Ottawa",
                                                      region: Region(name: "América do Norte"),
@@ -65,7 +55,7 @@ final class CountriesViewModel {
                                                      population: "38.246.108",
                                                      coin: "$",
                                                      flag: "ca",
-                                                     isFavorited: false),
+                                                     isFavorited: true),
                                             Country(name: "Espanha",
                                                      capital: "Madrid",
                                                      region: Region(name: "Europa Ocidental"),
@@ -79,7 +69,7 @@ final class CountriesViewModel {
                                                      population: "47.615.034",
                                                      coin: "€",
                                                      flag: "es",
-                                                     isFavorited: false),
+                                                     isFavorited: true),
                                             Country(name: "Itália",
                                                      capital: "Roma",
                                                      region: Region(name: "Europa Meridional"),
@@ -95,7 +85,7 @@ final class CountriesViewModel {
                                                      population: "58.870.762",
                                                      coin: "€",
                                                      flag: "it",
-                                                     isFavorited: false),
+                                                     isFavorited: true),
                                             Country(name: "Japão",
                                                      capital: "Tokyo",
                                                      region: Region(name: "Leste Asiático"),
@@ -106,93 +96,14 @@ final class CountriesViewModel {
                                                      population: "125.836.021",
                                                      coin: "¥",
                                                      flag: "jp",
-                                                     isFavorited: false)
+                                                     isFavorited: true)
     ]
     
-    private var filteredCountries: [Country] = []
-    private var currentSearchText: String = ""
-    private var selectedContinentIndex: Int = 0
-    
-    init() {
-        self.filteredCountries = countrieList
-    }
-    
-    private func applyFilters() {
-        var result = countrieList
-        
-        let selectedContinent = continent(at: selectedContinentIndex).name
-        
-        if selectedContinent != "Todas" {
-            result = result.filter { $0.continent.name == selectedContinent }
-        }
-        
-        let search = currentSearchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        if !search.isEmpty {
-            result = result.filter {
-                $0.name.localizedCaseInsensitiveContains(search)
-            }
-        }
-        
-        filteredCountries = result
-    }
-    
-    private func applyContinentSelection(oldIndex: Int, newIndex: Int) {
-        continentList[oldIndex].isSelected = false
-        continentList[newIndex].isSelected = true
-    }
-    
-    var numberOfRowsInSection: Int {
-        filteredCountries.count
-    }
-    
     var numberOfItemsInSection: Int {
-        continentList.count
-    }
-    
-    var shouldShowEmptyState: Bool {
-        filteredCountries.isEmpty
-    }
-    
-    var emptyStateMessage: String {
-        if !currentSearchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return "Ops! Nenhum país chamado \(currentSearchText) foi encontrado, tente novamente!"
-        }
-        
-        let selectedContinent = continent(at: selectedContinentIndex).name
-        if selectedContinent != "Todas" {
-            return "Nenhum país encontrado para o continente selecionado."
-        }
-        
-        return "Nenhum país encontrado."
+        countryFavoriteList.count
     }
     
     func country(at index: Int) -> Country {
-        return filteredCountries[index]
-    }
-    
-    func toggleFavorite(at index: Int) {
-        filteredCountries[index].isFavorited.toggle()
-    }
-    
-    func continent(at index: Int) -> Continent {
-        return continentList[index]
-    }
-    
-    func searchCountries(with text: String) {
-        currentSearchText = text
-        applyFilters()
-    }
-    
-    func didSelectContinent(at index: Int) -> (oldIndex: Int, newIndex: Int)? {
-        guard selectedContinentIndex != index else { return nil }
-        
-        let oldIndex = selectedContinentIndex
-        selectedContinentIndex = index
-        
-        applyContinentSelection(oldIndex: oldIndex, newIndex: index)
-        applyFilters()
-        
-        return (oldIndex, index)
+        return countryFavoriteList[index]
     }
 }

@@ -38,7 +38,7 @@ class FavoritesViewController: UIViewController {
 
 extension FavoritesViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let countrieDetailViewController = CountrieDetailViewController(countrie: favoritesViewModel.country(at: indexPath.item))
+        let countrieDetailViewController = CountryDetailViewController(country: favoritesViewModel.country(at: indexPath.item))
         navigationController?.pushViewController(countrieDetailViewController, animated: true)
     }
 }

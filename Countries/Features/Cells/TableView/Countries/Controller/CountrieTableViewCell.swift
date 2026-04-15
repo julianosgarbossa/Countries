@@ -14,6 +14,7 @@ protocol CountrieTableViewCellDelegate: AnyObject {
 class CountrieTableViewCell: UITableViewCell {
 
     static let identifier: String = String(describing: CountrieTableViewCell.self)
+    static let heightForRowAt: CGFloat = 106
     
     private weak var delegate: CountrieTableViewCellDelegate?
     

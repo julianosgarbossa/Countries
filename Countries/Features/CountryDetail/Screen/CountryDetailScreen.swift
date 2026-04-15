@@ -12,7 +12,7 @@ protocol CountrieDetailScreenDelegate: AnyObject {
     func didTapFavoriteButton()
 }
 
-class CountrieDetailScreen: UIView {
+class CountryDetailScreen: UIView {
     
     private weak var delegate: CountrieDetailScreenDelegate?
     
@@ -553,5 +553,17 @@ class CountrieDetailScreen: UIView {
     func setScrollBottomInset(_ inset: CGFloat) {
         scrollView.contentInset.bottom = inset
         scrollView.verticalScrollIndicatorInsets.bottom = inset
+    }
+    
+    func updateUI(data: CountryDetailData) {
+        countrieFlagImageView.image = UIImage(named: data.flagName)
+        favoriteButton.setImage(UIImage(systemName: data.isFavorited ? "star.fill" : "star"), for: .normal)
+        favoriteButton.tintColor = data.isFavorited ? UIColor(red: 253/255, green: 155/255, blue: 1/255, alpha: 1) : UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
+        countrieNameLabel.text = data.countryName
+        continentNameLabel.text = data.continentName
+        areaLabel.text = data.areaText
+        capitalLabel.text = data.capitalText
+        populationLabel.text = data.populationText
+        coinLabel.text = data.coinText
     }
 }

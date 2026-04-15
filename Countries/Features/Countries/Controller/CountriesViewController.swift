@@ -87,7 +87,7 @@ extension CountriesViewController: UICollectionViewDelegateFlowLayout {
 
 extension CountriesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let countrieDetailViewController = CountrieDetailViewController(countrie: countriesViewModel.country(at: indexPath.row))
+        let countrieDetailViewController = CountryDetailViewController(country: countriesViewModel.country(at: indexPath.row))
         navigationController?.pushViewController(countrieDetailViewController, animated: true)
     }
 }

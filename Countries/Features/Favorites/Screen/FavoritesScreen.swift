@@ -29,7 +29,7 @@ class FavoritesScreen: UIView {
         layout.minimumInteritemSpacing = 12
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.register(CountrieCollectionViewCell.self, forCellWithReuseIdentifier: CountrieCollectionViewCell.identifier)
+        collectionView.register(CountryCollectionViewCell.self, forCellWithReuseIdentifier: CountryCollectionViewCell.identifier)
         collectionView.backgroundColor = .clear
         collectionView.showsVerticalScrollIndicator = false
         return collectionView

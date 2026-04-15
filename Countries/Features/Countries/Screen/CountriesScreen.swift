@@ -46,6 +46,15 @@ class CountriesScreen: UIView {
         return view
     }()
     
+    private lazy var emptyStateLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.isHidden = true
+        return label
+    }()
+    
     lazy var countriesTableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -71,6 +80,7 @@ class CountriesScreen: UIView {
         addSubview(regionsCollectionView)
         addSubview(cardTableView)
         cardTableView.addSubview(countriesTableView)
+        cardTableView.addSubview(emptyStateLabel)
         
         configConstraints()
     }
@@ -96,6 +106,10 @@ class CountriesScreen: UIView {
             countriesTableView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
             countriesTableView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
             countriesTableView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            
+            emptyStateLabel.centerYAnchor.constraint(equalTo: cardTableView.centerYAnchor),
+            emptyStateLabel.leadingAnchor.constraint(equalTo: countriesTableView.leadingAnchor),
+            emptyStateLabel.trailingAnchor.constraint(equalTo: countriesTableView.trailingAnchor),
         ])
     }
     
@@ -111,5 +125,16 @@ class CountriesScreen: UIView {
     func configTableView(delegate: UITableViewDelegate, dataSource: UITableViewDataSource) {
         countriesTableView.delegate = delegate
         countriesTableView.dataSource = dataSource
+    }
+    
+    func showEmptyState(message: String) {
+        emptyStateLabel.text = message
+        emptyStateLabel.isHidden = false
+        countriesTableView.isHidden = true
+    }
+
+    func hideEmptyState() {
+        emptyStateLabel.isHidden = true
+        countriesTableView.isHidden = false
     }
 }

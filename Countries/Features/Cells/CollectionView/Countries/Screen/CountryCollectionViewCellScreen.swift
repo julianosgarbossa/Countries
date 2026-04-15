@@ -7,7 +7,7 @@
 
 import UIKit
 
-class CountrieCollectionViewCellScreen: UIView {
+class CountryCollectionViewCellScreen: UIView {
 
     private lazy var cardFavoriteCountrieView: UIView = {
         let view = UIView()

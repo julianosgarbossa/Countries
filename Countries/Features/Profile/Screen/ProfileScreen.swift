@@ -286,6 +286,59 @@ class ProfileScreen: UIView {
         photoImageView.contentMode = .scaleAspectFill
     }
 
+    func setLogoutButtonLoading(_ isLoading: Bool) {
+        if isLoading {
+            logoutButton.setTitle("", for: .normal)
+            logoutButton.isEnabled = false
+            let spinner = UIActivityIndicatorView(style: .medium)
+            spinner.color = .white
+            spinner.tag = 9998
+            spinner.translatesAutoresizingMaskIntoConstraints = false
+            logoutButton.addSubview(spinner)
+            NSLayoutConstraint.activate([
+                spinner.centerXAnchor.constraint(equalTo: logoutButton.centerXAnchor),
+                spinner.centerYAnchor.constraint(equalTo: logoutButton.centerYAnchor),
+            ])
+            spinner.startAnimating()
+        } else {
+            logoutButton.setTitle("Sair da Conta", for: .normal)
+            logoutButton.isEnabled = true
+            if let spinner = logoutButton.viewWithTag(9998) as? UIActivityIndicatorView {
+                spinner.stopAnimating()
+                spinner.removeFromSuperview()
+            }
+        }
+    }
+
+    func setDeleteAccountButtonLoading(_ isLoading: Bool) {
+        if isLoading {
+            deleteAccountButton.setTitle("", for: .normal)
+            deleteAccountButton.isEnabled = false
+            let spinner = UIActivityIndicatorView(style: .medium)
+            spinner.color = .systemRed
+            spinner.tag = 9997
+            spinner.translatesAutoresizingMaskIntoConstraints = false
+            deleteAccountButton.addSubview(spinner)
+            NSLayoutConstraint.activate([
+                spinner.centerXAnchor.constraint(equalTo: deleteAccountButton.centerXAnchor),
+                spinner.centerYAnchor.constraint(equalTo: deleteAccountButton.centerYAnchor),
+            ])
+            spinner.startAnimating()
+        } else {
+            deleteAccountButton.setTitle("Excluir Conta", for: .normal)
+            deleteAccountButton.isEnabled = true
+            if let spinner = deleteAccountButton.viewWithTag(9997) as? UIActivityIndicatorView {
+                spinner.stopAnimating()
+                spinner.removeFromSuperview()
+            }
+        }
+    }
+
+    func setButtonsEnabled(_ enabled: Bool) {
+        logoutButton.isEnabled = enabled
+        deleteAccountButton.isEnabled = enabled
+    }
+
     // MARK: - Layout
 
     private func addVisualElements() {

@@ -21,6 +21,10 @@ class ProfileViewController: UIViewController {
         super.viewDidLoad()
         configNavigationControler()
         configProtocols()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         loadProfileData()
     }
 
@@ -47,13 +51,22 @@ class ProfileViewController: UIViewController {
         view.window?.rootViewController = nav
         view.window?.makeKeyAndVisible()
     }
+
+    private func showErrorAlert(message: String) {
+        let alert = UIAlertController(
+            title: "Erro",
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
 }
 
 // MARK: - ProfileScreenDelegate
 
 extension ProfileViewController: ProfileScreenDelegate {
     func didTapEditProfileButton() {
-        // Integração futura: navegar para tela de edição de perfil
         let alert = UIAlertController(
             title: "Editar Perfil",
             message: "Funcionalidade em breve.",
@@ -64,7 +77,6 @@ extension ProfileViewController: ProfileScreenDelegate {
     }
 
     func didTapChangePasswordButton() {
-        // Integração futura: navegar para tela de alteração de senha
         let alert = UIAlertController(
             title: "Alterar Senha",
             message: "Funcionalidade em breve.",
@@ -118,6 +130,10 @@ extension ProfileViewController: ProfileViewModelDelegate {
         navigateToLogin()
     }
 
+    func didLogoutFailure(message: String) {
+        showErrorAlert(message: message)
+    }
+
     func didDeleteAccountSuccess() {
         let alert = UIAlertController(
             title: "Conta Excluída",
@@ -131,12 +147,11 @@ extension ProfileViewController: ProfileViewModelDelegate {
     }
 
     func didDeleteAccountFailure(message: String) {
-        let alert = UIAlertController(
-            title: "Erro",
-            message: message,
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
+        showErrorAlert(message: message)
+    }
+
+    func didChangeLoadingState(isLoading: Bool) {
+        profileScreen?.setDeleteAccountButtonLoading(isLoading)
+        profileScreen?.setButtonsEnabled(!isLoading)
     }
 }

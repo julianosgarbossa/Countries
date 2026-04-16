@@ -177,4 +177,31 @@ class PasswordRecoveryScreen: UIView {
         sendRecoveryLinkButton.isEnabled = enabled
         sendRecoveryLinkButton.alpha = enabled ? 1.0 : 0.5
     }
+
+    func setSendRecoveryLinkButtonLoading(_ isLoading: Bool) {
+        if isLoading {
+            sendRecoveryLinkButton.setTitle("", for: .normal)
+            sendRecoveryLinkButton.isEnabled = false
+            let spinner = UIActivityIndicatorView(style: .medium)
+            spinner.color = .white
+            spinner.tag = 9999
+            spinner.translatesAutoresizingMaskIntoConstraints = false
+            sendRecoveryLinkButton.addSubview(spinner)
+            NSLayoutConstraint.activate([
+                spinner.centerXAnchor.constraint(equalTo: sendRecoveryLinkButton.centerXAnchor),
+                spinner.centerYAnchor.constraint(equalTo: sendRecoveryLinkButton.centerYAnchor),
+            ])
+            spinner.startAnimating()
+        } else {
+            sendRecoveryLinkButton.setTitle("Enviar Link de Recuperação", for: .normal)
+            if let spinner = sendRecoveryLinkButton.viewWithTag(9999) as? UIActivityIndicatorView {
+                spinner.stopAnimating()
+                spinner.removeFromSuperview()
+            }
+        }
+    }
+
+    func setFieldsEnabled(_ enabled: Bool) {
+        emailTextField.isEnabled = enabled
+    }
 }

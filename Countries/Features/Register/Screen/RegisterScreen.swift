@@ -463,4 +463,34 @@ class RegisterScreen: UIView {
         photoImageView.image = UIImage(named: "photo")
         photoImageView.contentMode = .scaleAspectFill
     }
+
+    func setRegisterButtonLoading(_ isLoading: Bool) {
+        if isLoading {
+            registerButton.setTitle("", for: .normal)
+            registerButton.isEnabled = false
+            let spinner = UIActivityIndicatorView(style: .medium)
+            spinner.color = .white
+            spinner.tag = 9999
+            spinner.translatesAutoresizingMaskIntoConstraints = false
+            registerButton.addSubview(spinner)
+            NSLayoutConstraint.activate([
+                spinner.centerXAnchor.constraint(equalTo: registerButton.centerXAnchor),
+                spinner.centerYAnchor.constraint(equalTo: registerButton.centerYAnchor),
+            ])
+            spinner.startAnimating()
+        } else {
+            registerButton.setTitle("Cadastrar", for: .normal)
+            if let spinner = registerButton.viewWithTag(9999) as? UIActivityIndicatorView {
+                spinner.stopAnimating()
+                spinner.removeFromSuperview()
+            }
+        }
+    }
+
+    func setFieldsEnabled(_ enabled: Bool) {
+        nameTextField.isEnabled = enabled
+        emailTextField.isEnabled = enabled
+        passwordTextField.isEnabled = enabled
+        confirmPasswordTextField.isEnabled = enabled
+    }
 }

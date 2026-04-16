@@ -6,11 +6,14 @@
 //
 
 import Foundation
+import FirebaseAuth
 
 protocol ProfileViewModelDelegate: AnyObject {
     func didLogoutSuccess()
+    func didLogoutFailure(message: String)
     func didDeleteAccountSuccess()
     func didDeleteAccountFailure(message: String)
+    func didChangeLoadingState(isLoading: Bool)
 }
 
 final class ProfileViewModel {
@@ -18,11 +21,11 @@ final class ProfileViewModel {
     weak var delegate: ProfileViewModelDelegate?
 
     var userName: String {
-        return "Usuário Countries"
+        AuthService.shared.currentUser?.displayName ?? "Usuário"
     }
 
     var userEmail: String {
-        return "usuario@countries.com"
+        AuthService.shared.currentUser?.email ?? ""
     }
 
     var appVersion: String {
@@ -32,12 +35,27 @@ final class ProfileViewModel {
     }
 
     func logout() {
-        delegate?.didLogoutSuccess()
+        do {
+            try AuthService.shared.logout()
+            delegate?.didLogoutSuccess()
+        } catch {
+            delegate?.didLogoutFailure(message: FirebaseErrorMapper.message(for: error))
+        }
     }
 
     func deleteAccount() {
-        // Integração futura com camada de serviço (Firebase Auth)
-        // Após deletar no backend, limpar dados locais (Keychain, UserDefaults, cache)
-        delegate?.didDeleteAccountSuccess()
+        delegate?.didChangeLoadingState(isLoading: true)
+
+        AuthService.shared.deleteAccount { [weak self] result in
+            DispatchQueue.main.async {
+                self?.delegate?.didChangeLoadingState(isLoading: false)
+                switch result {
+                case .success:
+                    self?.delegate?.didDeleteAccountSuccess()
+                case .failure(let error):
+                    self?.delegate?.didDeleteAccountFailure(message: FirebaseErrorMapper.message(for: error))
+                }
+            }
+        }
     }
 }

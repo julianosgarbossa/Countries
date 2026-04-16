@@ -407,4 +407,32 @@ class LoginScreen: UIView {
         loginButton.isEnabled = enabled
         loginButton.alpha = enabled ? 1.0 : 0.5
     }
+
+    func setLoginButtonLoading(_ isLoading: Bool) {
+        if isLoading {
+            loginButton.setTitle("", for: .normal)
+            loginButton.isEnabled = false
+            let spinner = UIActivityIndicatorView(style: .medium)
+            spinner.color = .white
+            spinner.tag = 9999
+            spinner.translatesAutoresizingMaskIntoConstraints = false
+            loginButton.addSubview(spinner)
+            NSLayoutConstraint.activate([
+                spinner.centerXAnchor.constraint(equalTo: loginButton.centerXAnchor),
+                spinner.centerYAnchor.constraint(equalTo: loginButton.centerYAnchor),
+            ])
+            spinner.startAnimating()
+        } else {
+            loginButton.setTitle("Entrar", for: .normal)
+            if let spinner = loginButton.viewWithTag(9999) as? UIActivityIndicatorView {
+                spinner.stopAnimating()
+                spinner.removeFromSuperview()
+            }
+        }
+    }
+
+    func setFieldsEnabled(_ enabled: Bool) {
+        emailTextField.isEnabled = enabled
+        passwordTextField.isEnabled = enabled
+    }
 }

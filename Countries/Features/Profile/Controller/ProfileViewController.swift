@@ -8,10 +8,10 @@
 import UIKit
 
 class ProfileViewController: UIViewController {
-    
+
     private var profileScreen: ProfileScreen?
     private let profileViewModel = ProfileViewModel()
-    
+
     override func loadView() {
         profileScreen = ProfileScreen()
         view = profileScreen
@@ -21,29 +21,122 @@ class ProfileViewController: UIViewController {
         super.viewDidLoad()
         configNavigationControler()
         configProtocols()
+        loadProfileData()
     }
-    
+
     private func configNavigationControler() {
         navigationController?.navigationBar.isHidden = true
     }
-    
+
     private func configProtocols() {
         profileScreen?.delegate(delegate: self)
         profileViewModel.delegate = self
     }
-}
 
-extension ProfileViewController: ProfileScreenDelegate {
-    func didTapLogoutButton() {
-        profileViewModel.logout()
+    private func loadProfileData() {
+        profileScreen?.configureProfile(
+            name: profileViewModel.userName,
+            email: profileViewModel.userEmail,
+            version: profileViewModel.appVersion
+        )
     }
-}
 
-extension ProfileViewController: ProfileViewModelDelegate {
-    func didLogoutSuccess() {
+    private func navigateToLogin() {
         let loginViewController = LoginViewController()
         let nav = UINavigationController(rootViewController: loginViewController)
         view.window?.rootViewController = nav
         view.window?.makeKeyAndVisible()
+    }
+}
+
+// MARK: - ProfileScreenDelegate
+
+extension ProfileViewController: ProfileScreenDelegate {
+    func didTapEditProfileButton() {
+        // Integração futura: navegar para tela de edição de perfil
+        let alert = UIAlertController(
+            title: "Editar Perfil",
+            message: "Funcionalidade em breve.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+
+    func didTapChangePasswordButton() {
+        // Integração futura: navegar para tela de alteração de senha
+        let alert = UIAlertController(
+            title: "Alterar Senha",
+            message: "Funcionalidade em breve.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+
+    func didTapPrivacyPolicyButton() {
+        guard let url = URL(string: "https://www.example.com/privacy") else { return }
+        UIApplication.shared.open(url)
+    }
+
+    func didTapTermsOfUseButton() {
+        guard let url = URL(string: "https://www.example.com/terms") else { return }
+        UIApplication.shared.open(url)
+    }
+
+    func didTapLogoutButton() {
+        let alert = UIAlertController(
+            title: "Sair da Conta",
+            message: "Tem certeza que deseja sair?",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Cancelar", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Sair", style: .destructive) { [weak self] _ in
+            self?.profileViewModel.logout()
+        })
+        present(alert, animated: true)
+    }
+
+    func didTapDeleteAccountButton() {
+        let alert = UIAlertController(
+            title: "Excluir Conta",
+            message: "Essa ação é irreversível. Todos os seus dados serão permanentemente removidos. Deseja continuar?",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Cancelar", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Excluir", style: .destructive) { [weak self] _ in
+            self?.profileViewModel.deleteAccount()
+        })
+        present(alert, animated: true)
+    }
+}
+
+// MARK: - ProfileViewModelDelegate
+
+extension ProfileViewController: ProfileViewModelDelegate {
+    func didLogoutSuccess() {
+        navigateToLogin()
+    }
+
+    func didDeleteAccountSuccess() {
+        let alert = UIAlertController(
+            title: "Conta Excluída",
+            message: "Sua conta foi excluída com sucesso.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
+            self?.navigateToLogin()
+        })
+        present(alert, animated: true)
+    }
+
+    func didDeleteAccountFailure(message: String) {
+        let alert = UIAlertController(
+            title: "Erro",
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }

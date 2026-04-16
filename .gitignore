@@ -45,6 +45,9 @@ iOSInjectionProject/
 timeline.xctimeline
 playground.xcworkspace
 
+# Firebase / Secrets
+GoogleService-Info.plist
+
 # Others
 *.swp
 *~

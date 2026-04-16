@@ -27,13 +27,13 @@ class LoginViewController: UIViewController {
         configNavigationControler()
     }
     
-    func configProtocols() {
+    private func configProtocols() {
         loginScreen?.delegate(delegate: self)
         loginScreen?.configTextField(delegate: self)
         loginViewModel.delegate = self
     }
     
-    func configNavigationControler() {
+    private func configNavigationControler() {
         navigationController?.navigationBar.isHidden = true
         navigationController?.navigationBar.tintColor = .white
         navigationItem.backButtonTitle = "Login"
@@ -47,7 +47,6 @@ extension LoginViewController: LoginScreenDelegate {
     }
     
     func didTapLoginButton() {
-        print("Enviando Para API Firebase Auth -> Logando Usuario")
         loginViewModel.login()
     }
     
@@ -59,30 +58,22 @@ extension LoginViewController: LoginScreenDelegate {
 
 extension LoginViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        guard let loginScreen else { return true }
+        guard let loginScreen,
+              let fieldTag = loginScreen.loginFieldType(for: textField) else { return true }
         
         let textAfterChange = (textField.text ?? "").applyingReplacement(range: range, with: string)
         
-        switch textField {
-        case loginScreen.emailTextField:
+        switch fieldTag {
+        case .email:
             loginViewModel.updateField(field: .email, value: textAfterChange)
-        case loginScreen.passwordTextField:
+        case .password:
             loginViewModel.updateField(field: .password, value: textAfterChange)
-        default:
-            return true
         }
         return true
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        guard let loginScreen else { return true }
-
-        switch textField {
-        case loginScreen.emailTextField:
-            loginScreen.passwordTextField.becomeFirstResponder()
-        default:
-            textField.resignFirstResponder()
-        }
+        loginScreen?.focusNextField(after: textField)
         return true
     }
 }
@@ -95,20 +86,18 @@ extension LoginViewController: LoginViewModelDelegate {
     func didValidateField(field: LoginViewModel.LoginFieldType, isValid: Bool) {
         guard let loginScreen else { return }
         
-        let textField: UITextField
-
+        let fieldTag: LoginFieldTag
         switch field {
         case .email:
-            textField = loginScreen.emailTextField
+            fieldTag = .email
         case .password:
-            textField = loginScreen.passwordTextField
+            fieldTag = .password
         }
-
-        textField.layer.borderColor = isValid ? defaultBorderColor : UIColor.red.cgColor
+        
+        loginScreen.setFieldBorderColor(field: fieldTag, color: isValid ? defaultBorderColor : UIColor.red.cgColor)
     }
     
     func didLoginSuccess() {
-        print("Resposta da API Firebase Auth -> Sucesso ou Falha")
         let tabBarController = TabBarController()
         view.window?.rootViewController = tabBarController
         view.window?.makeKeyAndVisible()

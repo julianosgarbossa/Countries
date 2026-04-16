@@ -47,7 +47,6 @@ class CountryCollectionViewCell: UICollectionViewCell {
     }
     
     func setupCell(country: Country) {
-        countryCollectionViewCellScreen.countrieFlagImageView.image = UIImage(named: country.flag)
-        countryCollectionViewCellScreen.countrieNameLabel.text = country.name
+        countryCollectionViewCellScreen.configure(country: country)
     }
 }

@@ -43,7 +43,7 @@ class BorderCollectionViewCellScreen: UIView {
         return imageView
     }()
 
-    lazy var borderNameLabel: UILabel = {
+    private lazy var borderNameLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = UIColor(red: 74/255, green: 74/255, blue: 74/255, alpha: 1)

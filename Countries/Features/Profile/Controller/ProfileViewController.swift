@@ -9,11 +9,12 @@ import UIKit
 
 class ProfileViewController: UIViewController {
     
-    private var profileScren: ProfileScreen?
+    private var profileScreen: ProfileScreen?
+    private let profileViewModel = ProfileViewModel()
     
     override func loadView() {
-        profileScren = ProfileScreen()
-        view = profileScren
+        profileScreen = ProfileScreen()
+        view = profileScreen
     }
 
     override func viewDidLoad() {
@@ -27,12 +28,19 @@ class ProfileViewController: UIViewController {
     }
     
     private func configProtocols() {
-        profileScren?.delegate(delegate: self)
+        profileScreen?.delegate(delegate: self)
+        profileViewModel.delegate = self
     }
 }
 
 extension ProfileViewController: ProfileScreenDelegate {
     func didTapLogoutButton() {
+        profileViewModel.logout()
+    }
+}
+
+extension ProfileViewController: ProfileViewModelDelegate {
+    func didLogoutSuccess() {
         let loginViewController = LoginViewController()
         let nav = UINavigationController(rootViewController: loginViewController)
         view.window?.rootViewController = nav

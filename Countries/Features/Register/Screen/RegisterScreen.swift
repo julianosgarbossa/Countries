@@ -11,6 +11,13 @@ protocol RegisterScreenDelegate: AnyObject {
     func didTapRegisterButton()
 }
 
+enum RegisterFieldTag: Int {
+    case name = 200
+    case email = 201
+    case password = 202
+    case confirmPassword = 203
+}
+
 class RegisterScreen: UIView {
 
     private weak var delegate: RegisterScreenDelegate?
@@ -114,7 +121,7 @@ class RegisterScreen: UIView {
         return label
     }()
     
-    lazy var nameTextField: UITextField = {
+    private lazy var nameTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.placeholder = "Informe o nome completo"
@@ -135,6 +142,7 @@ class RegisterScreen: UIView {
         textField.autocorrectionType = .no
         textField.spellCheckingType = .no
         textField.isSecureTextEntry = false
+        textField.tag = RegisterFieldTag.name.rawValue
         return textField
     }()
     
@@ -149,7 +157,7 @@ class RegisterScreen: UIView {
         return label
     }()
     
-    lazy var emailTextField: UITextField = {
+    private lazy var emailTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.placeholder = "Informe o email"
@@ -170,6 +178,7 @@ class RegisterScreen: UIView {
         textField.autocorrectionType = .no
         textField.spellCheckingType = .no
         textField.isSecureTextEntry = false
+        textField.tag = RegisterFieldTag.email.rawValue
         return textField
     }()
     
@@ -184,7 +193,7 @@ class RegisterScreen: UIView {
         return label
     }()
     
-    lazy var passwordTextField: UITextField = {
+    private lazy var passwordTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.placeholder = "Informe uma senha"
@@ -205,6 +214,7 @@ class RegisterScreen: UIView {
         textField.autocorrectionType = .no
         textField.spellCheckingType = .no
         textField.isSecureTextEntry = true
+        textField.tag = RegisterFieldTag.password.rawValue
         return textField
     }()
     
@@ -219,7 +229,7 @@ class RegisterScreen: UIView {
         return label
     }()
     
-    lazy var confirmPasswordTextField: UITextField = {
+    private lazy var confirmPasswordTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.placeholder = "Informe a senha novamente"
@@ -240,6 +250,7 @@ class RegisterScreen: UIView {
         textField.autocorrectionType = .no
         textField.spellCheckingType = .no
         textField.isSecureTextEntry = true
+        textField.tag = RegisterFieldTag.confirmPassword.rawValue
         return textField
     }()
     
@@ -411,6 +422,36 @@ class RegisterScreen: UIView {
         emailTextField.delegate = delegate
         passwordTextField.delegate = delegate
         confirmPasswordTextField.delegate = delegate
+    }
+    
+    func registerFieldType(for textField: UITextField) -> RegisterFieldTag? {
+        RegisterFieldTag(rawValue: textField.tag)
+    }
+    
+    func setFieldBorderColor(field: RegisterFieldTag, color: CGColor) {
+        switch field {
+        case .name:
+            nameTextField.layer.borderColor = color
+        case .email:
+            emailTextField.layer.borderColor = color
+        case .password:
+            passwordTextField.layer.borderColor = color
+        case .confirmPassword:
+            confirmPasswordTextField.layer.borderColor = color
+        }
+    }
+    
+    func focusNextField(after textField: UITextField) {
+        switch RegisterFieldTag(rawValue: textField.tag) {
+        case .name:
+            emailTextField.becomeFirstResponder()
+        case .email:
+            passwordTextField.becomeFirstResponder()
+        case .password:
+            confirmPasswordTextField.becomeFirstResponder()
+        default:
+            textField.resignFirstResponder()
+        }
     }
     
     func setRegisterButtonEnabled(_ enabled: Bool) {

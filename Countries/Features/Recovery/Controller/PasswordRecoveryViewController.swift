@@ -60,7 +60,7 @@ extension PasswordRecoveryViewController: UITextFieldDelegate {
 
 extension PasswordRecoveryViewController: PasswordRecoveryViewModelDelegate {
     func didValidateFieldAndButton(isValid: Bool) {
-        passwordRecoveryScreen?.emailTextField.layer.borderColor = isValid ? defaultBorderColor : UIColor.red.cgColor
+        passwordRecoveryScreen?.setEmailFieldBorderColor(isValid ? defaultBorderColor : UIColor.red.cgColor)
         passwordRecoveryScreen?.setSendRecoveryLinkButtonEnabled(isValid)
     }
     

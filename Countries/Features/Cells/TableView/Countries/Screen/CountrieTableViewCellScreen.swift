@@ -29,7 +29,7 @@ class CountrieTableViewCellScreen: UIView {
         return view
     }()
     
-    lazy var countrieFlagImageView: UIImageView = {
+    private lazy var countrieFlagImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.highlightedImage = nil
@@ -52,7 +52,7 @@ class CountrieTableViewCellScreen: UIView {
         return label
     }()
     
-    lazy var countrieNameLabel: UILabel = {
+    private lazy var countrieNameLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
@@ -73,7 +73,7 @@ class CountrieTableViewCellScreen: UIView {
         return label
     }()
     
-    lazy var countrieCapitalLabel: UILabel = {
+    private lazy var countrieCapitalLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
@@ -94,7 +94,7 @@ class CountrieTableViewCellScreen: UIView {
         return label
     }()
     
-    lazy var countrieRegionLabel: UILabel = {
+    private lazy var countrieRegionLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
@@ -219,7 +219,15 @@ class CountrieTableViewCellScreen: UIView {
         countrieRegionLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     }
     
-    func configButton(isFavorited: Bool) {
+    func configure(country: Country) {
+        countrieFlagImageView.image = UIImage(named: country.flag)
+        countrieNameLabel.text = country.name
+        countrieCapitalLabel.text = country.capital
+        countrieRegionLabel.text = country.region.name
+        configureFavoriteButton(isFavorited: country.isFavorited)
+    }
+    
+    private func configureFavoriteButton(isFavorited: Bool) {
         favoriteButton.setImage( isFavorited ? UIImage(systemName: "star.fill") : UIImage(systemName: "star"), for: .normal)
         favoriteButton.tintColor = isFavorited ? UIColor(red: 253/255, green: 155/255, blue: 1/255, alpha: 1) : UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
     }

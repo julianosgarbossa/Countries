@@ -9,7 +9,7 @@ import UIKit
 
 class ContinentCollectionViewCellScreen: UIView {
     
-    lazy var continentNameLabel: UILabel = {
+    private lazy var continentNameLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
@@ -41,5 +41,12 @@ class ContinentCollectionViewCellScreen: UIView {
             continentNameLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             continentNameLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
         ])
+    }
+    
+    func configure(continent: Continent) {
+        continentNameLabel.text = continent.name
+        continentNameLabel.textColor = continent.isSelected
+            ? UIColor(red: 253/255, green: 155/255, blue: 1/255, alpha: 1)
+            : UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
     }
 }

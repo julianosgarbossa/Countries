@@ -41,45 +41,32 @@ class RegisterViewController: UIViewController {
 extension RegisterViewController: UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        guard let registerScreen else { return true }
+        guard let registerScreen,
+              let fieldTag = registerScreen.registerFieldType(for: textField) else { return true }
 
         let textAfterChange = (textField.text ?? "").applyingReplacement(range: range, with: string)
 
-        switch textField {
-        case registerScreen.nameTextField:
+        switch fieldTag {
+        case .name:
             registerViewModel.updateField(field: .name, value: textAfterChange)
-        case registerScreen.emailTextField:
+        case .email:
             registerViewModel.updateField(field: .email, value: textAfterChange)
-        case registerScreen.passwordTextField:
+        case .password:
             registerViewModel.updateField(field: .password, value: textAfterChange)
-        case registerScreen.confirmPasswordTextField:
+        case .confirmPassword:
             registerViewModel.updateField(field: .confirmPassword, value: textAfterChange)
-        default:
-            return true
         }
         return true
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        guard let registerScreen else { return true }
-
-        switch textField {
-        case registerScreen.nameTextField:
-            registerScreen.emailTextField.becomeFirstResponder()
-        case registerScreen.emailTextField:
-            registerScreen.passwordTextField.becomeFirstResponder()
-        case registerScreen.passwordTextField:
-            registerScreen.confirmPasswordTextField.becomeFirstResponder()
-        default:
-            textField.resignFirstResponder()
-        }
+        registerScreen?.focusNextField(after: textField)
         return true
     }
 }
 
 extension RegisterViewController: RegisterScreenDelegate {
     func didTapRegisterButton() {
-        print("Enviando Para API Firebase Auth -> Registrando Usuario")
         registerViewModel.register()
     }
 }
@@ -90,24 +77,24 @@ extension RegisterViewController: RegisterViewModelDelegate {
     }
     
     func didValidateField(field: RegisterViewModel.RegisterFieldType, isValid: Bool) {
-        guard let registerScreen = registerScreen else { return }
-                let textField: UITextField
+        guard let registerScreen else { return }
         
-                switch field {
-                case .name:
-                    textField = registerScreen.nameTextField
-                case .email:
-                    textField = registerScreen.emailTextField
-                case .password:
-                    textField = registerScreen.passwordTextField
-                case .confirmPassword:
-                    textField = registerScreen.confirmPasswordTextField
-                }
-
-                textField.layer.borderColor = isValid ? defaultBorderColor : UIColor.red.cgColor
+        let fieldTag: RegisterFieldTag
+        switch field {
+        case .name:
+            fieldTag = .name
+        case .email:
+            fieldTag = .email
+        case .password:
+            fieldTag = .password
+        case .confirmPassword:
+            fieldTag = .confirmPassword
+        }
+        
+        registerScreen.setFieldBorderColor(field: fieldTag, color: isValid ? defaultBorderColor : UIColor.red.cgColor)
     }
     
     func didRegisterSuccess() {
-        print("Resposta da API Firebase Auth -> Sucesso ou Falha")
+        // Integração futura com camada de serviço (Firebase Auth)
     }
 }

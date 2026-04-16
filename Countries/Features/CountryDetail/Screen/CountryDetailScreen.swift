@@ -12,6 +12,11 @@ protocol CountrieDetailScreenDelegate: AnyObject {
     func didTapFavoriteButton()
 }
 
+enum DetailCollectionViewType {
+    case languages
+    case borders
+}
+
 class CountryDetailScreen: UIView {
     
     private weak var delegate: CountrieDetailScreenDelegate?
@@ -35,7 +40,7 @@ class CountryDetailScreen: UIView {
         return view
     }()
     
-    lazy var countrieFlagImageView: UIImageView = {
+    private lazy var countrieFlagImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFill
@@ -67,7 +72,7 @@ class CountryDetailScreen: UIView {
         return button
     }()
     
-    lazy var favoriteButton: UIButton = {
+    private lazy var favoriteButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.tintColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
@@ -95,7 +100,7 @@ class CountryDetailScreen: UIView {
         return view
     }()
     
-    lazy var countrieNameLabel: UILabel = {
+    private lazy var countrieNameLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
@@ -117,7 +122,7 @@ class CountryDetailScreen: UIView {
         return label
     }()
     
-    lazy var continentNameLabel: UILabel = {
+    private lazy var continentNameLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
@@ -139,7 +144,7 @@ class CountryDetailScreen: UIView {
         return imageView
     }()
     
-    lazy var areaLabel: UILabel = {
+    private lazy var areaLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
@@ -169,7 +174,7 @@ class CountryDetailScreen: UIView {
         return label
     }()
     
-    lazy var bordersCollectionView: UICollectionView = {
+    private lazy var bordersCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumInteritemSpacing = 12
@@ -206,7 +211,7 @@ class CountryDetailScreen: UIView {
         return label
     }()
     
-    lazy var capitalLabel: UILabel = {
+    private lazy var capitalLabel: UILabel = {
         let label = UILabel()
         label.text = "Brasília"
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -242,7 +247,7 @@ class CountryDetailScreen: UIView {
         return label
     }()
     
-    lazy var populationLabel: UILabel = {
+    private lazy var populationLabel: UILabel = {
         let label = UILabel()
         label.text = "213.421.037"
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -278,7 +283,7 @@ class CountryDetailScreen: UIView {
         return label
     }()
     
-    lazy var coinLabel: UILabel = {
+    private lazy var coinLabel: UILabel = {
         let label = UILabel()
         label.text = "R$"
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -307,7 +312,7 @@ class CountryDetailScreen: UIView {
         return label
     }()
     
-    lazy var languagesCollectionView: UICollectionView = {
+    private lazy var languagesCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumInteritemSpacing = 12
@@ -548,6 +553,12 @@ class CountryDetailScreen: UIView {
         bordersCollectionView.dataSource = dataSource
         languagesCollectionView.delegate = delegate
         languagesCollectionView.dataSource = dataSource
+    }
+    
+    func collectionViewType(for collectionView: UICollectionView) -> DetailCollectionViewType? {
+        if collectionView === languagesCollectionView { return .languages }
+        if collectionView === bordersCollectionView { return .borders }
+        return nil
     }
 
     func setScrollBottomInset(_ inset: CGFloat) {

@@ -55,7 +55,7 @@ class CountriesScreen: UIView {
         return label
     }()
     
-    lazy var countriesTableView: UITableView = {
+    private lazy var countriesTableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(CountrieTableViewCell.self, forCellReuseIdentifier: CountrieTableViewCell.identifier)
@@ -125,6 +125,18 @@ class CountriesScreen: UIView {
     func configTableView(delegate: UITableViewDelegate, dataSource: UITableViewDataSource) {
         countriesTableView.delegate = delegate
         countriesTableView.dataSource = dataSource
+    }
+    
+    func reloadTableView() {
+        countriesTableView.reloadData()
+    }
+    
+    func reloadTableViewRows(at indexPaths: [IndexPath], with animation: UITableView.RowAnimation) {
+        countriesTableView.reloadRows(at: indexPaths, with: animation)
+    }
+    
+    func indexPathForTableViewCell(_ cell: UITableViewCell) -> IndexPath? {
+        countriesTableView.indexPath(for: cell)
     }
     
     func showEmptyState(message: String) {

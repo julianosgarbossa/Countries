@@ -59,11 +59,7 @@ class CountrieTableViewCell: UITableViewCell {
     }
     
     func setupCell(countrie: Country) {
-        countrieTableViewCellScreen.countrieFlagImageView.image = UIImage(named: countrie.flag)
-        countrieTableViewCellScreen.countrieNameLabel.text = countrie.name
-        countrieTableViewCellScreen.countrieCapitalLabel.text = countrie.capital
-        countrieTableViewCellScreen.countrieRegionLabel.text = countrie.region.name
-        countrieTableViewCellScreen.configButton(isFavorited: countrie.isFavorited)
+        countrieTableViewCellScreen.configure(country: countrie)
     }
 }
 

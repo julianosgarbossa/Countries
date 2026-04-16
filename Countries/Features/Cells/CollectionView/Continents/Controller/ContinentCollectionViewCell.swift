@@ -46,8 +46,7 @@ class ContinentCollectionViewCell: UICollectionViewCell {
     }
     
     func setupCell(continent: Continent) {
-        continentCollectionViewCellSreen.continentNameLabel.text = continent.name
-        continentCollectionViewCellSreen.continentNameLabel.textColor = continent.isSelected ? UIColor(red: 253/255, green: 155/255, blue: 1/255, alpha: 1) : UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
+        continentCollectionViewCellSreen.configure(continent: continent)
     }
     
     static func calculateSize(title: String) -> CGSize {

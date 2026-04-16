@@ -13,6 +13,11 @@ protocol LoginScreenDelegate: AnyObject {
     func didTapRegisterButton()
 }
 
+enum LoginFieldTag: Int {
+    case email = 100
+    case password = 101
+}
+
 class LoginScreen: UIView {
 
     private weak var delegate: LoginScreenDelegate?
@@ -118,7 +123,7 @@ class LoginScreen: UIView {
         return label
     }()
     
-    lazy var emailTextField: UITextField = {
+    private lazy var emailTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.placeholder = "Informe seu email"
@@ -139,6 +144,7 @@ class LoginScreen: UIView {
         textField.autocorrectionType = .no
         textField.spellCheckingType = .no
         textField.isSecureTextEntry = false
+        textField.tag = LoginFieldTag.email.rawValue
         return textField
     }()
     
@@ -153,7 +159,7 @@ class LoginScreen: UIView {
         return label
     }()
     
-    lazy var passwordTextField: UITextField = {
+    private lazy var passwordTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.placeholder = "Informe sua senha"
@@ -174,6 +180,7 @@ class LoginScreen: UIView {
         textField.autocorrectionType = .no
         textField.spellCheckingType = .no
         textField.isSecureTextEntry = true
+        textField.tag = LoginFieldTag.password.rawValue
         return textField
     }()
     
@@ -372,6 +379,28 @@ class LoginScreen: UIView {
     func configTextField(delegate: UITextFieldDelegate) {
         emailTextField.delegate = delegate
         passwordTextField.delegate = delegate
+    }
+    
+    func loginFieldType(for textField: UITextField) -> LoginFieldTag? {
+        LoginFieldTag(rawValue: textField.tag)
+    }
+    
+    func setFieldBorderColor(field: LoginFieldTag, color: CGColor) {
+        switch field {
+        case .email:
+            emailTextField.layer.borderColor = color
+        case .password:
+            passwordTextField.layer.borderColor = color
+        }
+    }
+    
+    func focusNextField(after textField: UITextField) {
+        switch LoginFieldTag(rawValue: textField.tag) {
+        case .email:
+            passwordTextField.becomeFirstResponder()
+        default:
+            textField.resignFirstResponder()
+        }
     }
     
     func setLoginButtonEnabled(_ enabled: Bool) {

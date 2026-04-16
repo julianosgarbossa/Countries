@@ -37,7 +37,7 @@ class CountriesViewController: UIViewController {
     }
     
     private func updateCountriesListUI() {
-        countriesScreen?.countriesTableView.reloadData()
+        countriesScreen?.reloadTableView()
         
         if countriesViewModel.shouldShowEmptyState {
             countriesScreen?.showEmptyState(message: countriesViewModel.emptyStateMessage)
@@ -111,8 +111,8 @@ extension CountriesViewController: UITableViewDataSource {
 
 extension CountriesViewController: CountrieTableViewCellDelegate {
     func countryCellDidTapFavorite(cell: CountrieTableViewCell) {
-        guard let indexPath = countriesScreen?.countriesTableView.indexPath(for: cell) else { return }
+        guard let indexPath = countriesScreen?.indexPathForTableViewCell(cell) else { return }
         countriesViewModel.toggleFavorite(at: indexPath.row)
-        countriesScreen?.countriesTableView.reloadRows(at: [indexPath], with: .none)
+        countriesScreen?.reloadTableViewRows(at: [indexPath], with: .none)
     }
 }

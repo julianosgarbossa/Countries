@@ -66,7 +66,7 @@ class PasswordRecoveryScreen: UIView {
         return label
     }()
     
-    lazy var emailTextField: UITextField = {
+    private lazy var emailTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.placeholder = "Informe seu email"
@@ -167,6 +167,10 @@ class PasswordRecoveryScreen: UIView {
     
     func configTextField(delegate: UITextFieldDelegate) {
         emailTextField.delegate = delegate
+    }
+    
+    func setEmailFieldBorderColor(_ color: CGColor) {
+        emailTextField.layer.borderColor = color
     }
     
     func setSendRecoveryLinkButtonEnabled(_ enabled: Bool) {

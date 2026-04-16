@@ -74,33 +74,41 @@ extension CountryDetailViewController: UICollectionViewDelegate {
 
 extension CountryDetailViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if collectionView === countryDetailScreen?.languagesCollectionView {
+        guard let type = countryDetailScreen?.collectionViewType(for: collectionView) else { return 0 }
+        
+        switch type {
+        case .languages:
             return countryDetailViewModel.languagesCount
+        case .borders:
+            return countryDetailViewModel.bordersCount
         }
-        return countryDetailViewModel.bordersCount
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if collectionView === countryDetailScreen?.languagesCollectionView {
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BorderCollectionViewCell.identifier, for: indexPath) as? BorderCollectionViewCell else { return UICollectionViewCell() }
+        guard let type = countryDetailScreen?.collectionViewType(for: collectionView) else { return UICollectionViewCell() }
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BorderCollectionViewCell.identifier, for: indexPath) as? BorderCollectionViewCell else { return UICollectionViewCell() }
+        
+        switch type {
+        case .languages:
             cell.setupCell(language: countryDetailViewModel.language(at: indexPath.item))
-            return cell
-        }
-        if collectionView === countryDetailScreen?.bordersCollectionView {
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BorderCollectionViewCell.identifier, for: indexPath) as? BorderCollectionViewCell else { return UICollectionViewCell() }
+        case .borders:
             cell.setupCell(border: countryDetailViewModel.border(at: indexPath.item))
-            return cell
         }
-        return UICollectionViewCell()
+        
+        return cell
     }
 }
 
 extension CountryDetailViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if collectionView === countryDetailScreen?.languagesCollectionView {
+        guard let type = countryDetailScreen?.collectionViewType(for: collectionView) else { return .zero }
+        
+        switch type {
+        case .languages:
             return BorderCollectionViewCell.calculateSize(title: countryDetailViewModel.language(at: indexPath.item), variant: .language)
+        case .borders:
+            return BorderCollectionViewCell.calculateSize(title: countryDetailViewModel.border(at: indexPath.item), variant: .countryBorder)
         }
-        return BorderCollectionViewCell.calculateSize(title: countryDetailViewModel.border(at: indexPath.item), variant: .countryBorder)
     }
 }
 

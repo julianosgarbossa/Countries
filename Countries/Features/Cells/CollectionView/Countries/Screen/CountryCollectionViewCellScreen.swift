@@ -19,7 +19,7 @@ class CountryCollectionViewCellScreen: UIView {
         return view
     }()
     
-    lazy var countrieFlagImageView: UIImageView = {
+    private lazy var countrieFlagImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFill
@@ -30,7 +30,7 @@ class CountryCollectionViewCellScreen: UIView {
         return imageView
     }()
     
-    lazy var countrieNameLabel: UILabel = {
+    private lazy var countrieNameLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
@@ -74,5 +74,10 @@ class CountryCollectionViewCellScreen: UIView {
             countrieNameLabel.leadingAnchor.constraint(equalTo: cardFavoriteCountrieView.leadingAnchor, constant: 14),
             countrieNameLabel.trailingAnchor.constraint(equalTo: cardFavoriteCountrieView.trailingAnchor, constant: -14),
         ])
+    }
+    
+    func configure(country: Country) {
+        countrieFlagImageView.image = UIImage(named: country.flag)
+        countrieNameLabel.text = country.name
     }
 }

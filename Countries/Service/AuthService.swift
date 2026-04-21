@@ -93,6 +93,7 @@ final class AuthService {
         }
     }
     func updatePassword(currentPassword: String, newPassword: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let user = currentUser,
               let email = user.email else {
             completion(.failure(AuthServiceError.noCurrentUser))
             return

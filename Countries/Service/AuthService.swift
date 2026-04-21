@@ -92,6 +92,26 @@ final class AuthService {
             completion(.success(()))
         }
     }
+    func updatePassword(currentPassword: String, newPassword: String, completion: @escaping (Result<Void, Error>) -> Void) {
+              let email = user.email else {
+            completion(.failure(AuthServiceError.noCurrentUser))
+            return
+        }
+        let credential = EmailAuthProvider.credential(withEmail: email, password: currentPassword)
+        user.reauthenticate(with: credential) { _, error in
+            if let error {
+                completion(.failure(error))
+                return
+            }
+            user.updatePassword(to: newPassword) { error in
+                if let error {
+                    completion(.failure(error))
+                    return
+                }
+                completion(.success(()))
+            }
+        }
+    }
 }
 
 enum AuthServiceError: LocalizedError {

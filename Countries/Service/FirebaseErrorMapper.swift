@@ -34,7 +34,7 @@ struct FirebaseErrorMapper {
         case .networkError:
             return "Erro de conexão. Verifique sua internet e tente novamente."
         case .requiresRecentLogin:
-            return "Por segurança, faça login novamente antes de excluir a conta."
+            return "Por segurança, faça login novamente e tente de novo."
         default:
             return error.localizedDescription
         }

@@ -38,7 +38,8 @@ class RegisterScreen: UIView {
         scroll.translatesAutoresizingMaskIntoConstraints = false
         scroll.showsVerticalScrollIndicator = false
         scroll.showsHorizontalScrollIndicator = false
-        scroll.contentInsetAdjustmentBehavior = .automatic
+        scroll.contentInsetAdjustmentBehavior = .never
+        scroll.keyboardDismissMode = .interactive
         scroll.backgroundColor = .clear
         return scroll
     }()
@@ -492,5 +493,16 @@ class RegisterScreen: UIView {
         emailTextField.isEnabled = enabled
         passwordTextField.isEnabled = enabled
         confirmPasswordTextField.isEnabled = enabled
+    }
+
+    func updateKeyboardOverlapHeight(_ height: CGFloat) {
+        scrollView.contentInset.bottom = height
+        scrollView.verticalScrollIndicatorInsets.bottom = height
+    }
+
+    func ensureTextFieldVisible(_ textField: UITextField) {
+        let margin: CGFloat = 20
+        let rect = textField.convert(textField.bounds.insetBy(dx: 0, dy: -margin), to: scrollView)
+        scrollView.scrollRectToVisible(rect, animated: true)
     }
 }

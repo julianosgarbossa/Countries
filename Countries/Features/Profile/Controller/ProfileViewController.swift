@@ -25,6 +25,7 @@ class ProfileViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.navigationBar.isHidden = true
         loadProfileData()
     }
 
@@ -67,23 +68,13 @@ class ProfileViewController: UIViewController {
 
 extension ProfileViewController: ProfileScreenDelegate {
     func didTapEditProfileButton() {
-        let alert = UIAlertController(
-            title: "Editar Perfil",
-            message: "Funcionalidade em breve.",
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
+        let editProfileViewController = EditProfileViewController()
+        navigationController?.pushViewController(editProfileViewController, animated: true)
     }
 
     func didTapChangePasswordButton() {
-        let alert = UIAlertController(
-            title: "Alterar Senha",
-            message: "Funcionalidade em breve.",
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
+        let changePasswordViewController = ChangePasswordViewController()
+        navigationController?.pushViewController(changePasswordViewController, animated: true)
     }
 
     func didTapPrivacyPolicyButton() {

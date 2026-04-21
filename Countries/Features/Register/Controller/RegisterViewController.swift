@@ -12,6 +12,7 @@ class RegisterViewController: UIViewController {
     private var registerScreen: RegisterScreen?
     private let registerViewModel = RegisterViewModel()
     private let defaultBorderColor = UIColor(red: 253/255, green: 155/255, blue: 1/255, alpha: 1).cgColor
+    private var keyboardActiveTextField: UITextField?
 
     override func loadView() {
         registerScreen = RegisterScreen()
@@ -21,6 +22,39 @@ class RegisterViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configProtocols()
+        registerKeyboardNotifications()
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    private func registerKeyboardNotifications() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleKeyboardFrameChange(_:)),
+            name: UIResponder.keyboardWillChangeFrameNotification,
+            object: nil
+        )
+    }
+
+    @objc private func handleKeyboardFrameChange(_ notification: Notification) {
+        guard let frameEnd = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
+            return
+        }
+        let keyboardInView = view.convert(frameEnd, from: nil)
+        let overlap = view.bounds.intersection(keyboardInView).height
+
+        let duration = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0.25
+        let curveValue = (notification.userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? NSNumber)?.uintValue ?? 0
+        let options = UIView.AnimationOptions(rawValue: curveValue << 16)
+
+        UIView.animate(withDuration: duration, delay: 0, options: options) { [weak self] in
+            self?.registerScreen?.updateKeyboardOverlapHeight(overlap)
+        } completion: { [weak self] _ in
+            guard let self, let field = self.keyboardActiveTextField else { return }
+            self.registerScreen?.ensureTextFieldVisible(field)
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -73,6 +107,17 @@ extension RegisterViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         registerScreen?.focusNextField(after: textField)
         return true
+    }
+
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        keyboardActiveTextField = textField
+        registerScreen?.ensureTextFieldVisible(textField)
+    }
+
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        if keyboardActiveTextField === textField {
+            keyboardActiveTextField = nil
+        }
     }
 }
 

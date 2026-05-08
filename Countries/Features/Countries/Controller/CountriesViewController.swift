@@ -20,6 +20,7 @@ class CountriesViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configProtocols()
+        countriesViewModel.fetchCountries()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -34,6 +35,7 @@ class CountriesViewController: UIViewController {
         countriesScreen?.configSearchBar(delegate: self)
         countriesScreen?.configCollectionView(delegate: self, dataSource: self)
         countriesScreen?.configTableView(delegate: self, dataSource: self)
+        countriesViewModel.delegate = self
     }
     
     private func updateCountriesListUI() {
@@ -87,7 +89,7 @@ extension CountriesViewController: UICollectionViewDelegateFlowLayout {
 
 extension CountriesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let countrieDetailViewController = CountryDetailViewController(country: countriesViewModel.country(at: indexPath.row))
+        let countrieDetailViewController = CountryDetailViewController(countryId: countriesViewModel.country(at: indexPath.row).cca2)
         navigationController?.pushViewController(countrieDetailViewController, animated: true)
     }
 }
@@ -114,5 +116,12 @@ extension CountriesViewController: CountrieTableViewCellDelegate {
         guard let indexPath = countriesScreen?.indexPathForTableViewCell(cell) else { return }
         countriesViewModel.toggleFavorite(at: indexPath.row)
         countriesScreen?.reloadTableViewRows(at: [indexPath], with: .none)
+    }
+}
+
+extension CountriesViewController: CountriesViewModelProtocol {
+    func countriesViewModelUpdateUI() {
+        countriesScreen?.reloadTableView()
+        countriesScreen?.reloadCollectionView()
     }
 }

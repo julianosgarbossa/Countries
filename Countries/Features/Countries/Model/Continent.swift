@@ -9,5 +9,6 @@ import Foundation
 
 struct Continent {
     let name: String
+    let apiRegion: String?
     var isSelected: Bool = false
 }

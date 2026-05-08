@@ -38,8 +38,8 @@ class FavoritesViewController: UIViewController {
 
 extension FavoritesViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let countrieDetailViewController = CountryDetailViewController(country: favoritesViewModel.country(at: indexPath.item))
-        navigationController?.pushViewController(countrieDetailViewController, animated: true)
+//        let countrieDetailViewController = CountryDetailViewController(country: favoritesViewModel.country(at: indexPath.item))
+//        navigationController?.pushViewController(countrieDetailViewController, animated: true)
     }
 }
 
@@ -50,7 +50,7 @@ extension FavoritesViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CountryCollectionViewCell.identifier, for: indexPath) as? CountryCollectionViewCell else { return UICollectionViewCell() }
-        cell.setupCell(country: favoritesViewModel.country(at: indexPath.item))
+//        cell.setupCell(country: favoritesViewModel.country(at: indexPath.item))
         return cell
     }
 }

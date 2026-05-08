@@ -566,15 +566,24 @@ class CountryDetailScreen: UIView {
         scrollView.verticalScrollIndicatorInsets.bottom = inset
     }
     
-    func updateUI(data: CountryDetailData) {
-        countrieFlagImageView.image = UIImage(named: data.flagName)
+    func reloadCollectionViews() {
+        bordersCollectionView.reloadData()
+        languagesCollectionView.reloadData()
+    }
+    
+    func updateUI(data: CountryDetail) {
+        if data.flag.isEmpty {
+            countrieFlagImageView.image = nil
+        } else {
+            countrieFlagImageView.downloadImage(urlString: data.flag)
+        }
         favoriteButton.setImage(UIImage(systemName: data.isFavorited ? "star.fill" : "star"), for: .normal)
         favoriteButton.tintColor = data.isFavorited ? UIColor(red: 253/255, green: 155/255, blue: 1/255, alpha: 1) : UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
         countrieNameLabel.text = data.countryName
         continentNameLabel.text = data.continentName
-        areaLabel.text = data.areaText
-        capitalLabel.text = data.capitalText
-        populationLabel.text = data.populationText
-        coinLabel.text = data.coinText
+        areaLabel.text = data.area
+        capitalLabel.text = data.capital
+        populationLabel.text = data.population
+        coinLabel.text = data.coin
     }
 }

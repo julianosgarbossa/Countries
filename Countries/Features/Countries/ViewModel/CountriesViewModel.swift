@@ -7,153 +7,64 @@
 
 import Foundation
 
+protocol CountriesViewModelProtocol: AnyObject {
+    func countriesViewModelUpdateUI()
+}
+
 final class CountriesViewModel {
     
-    private var continentList: [Continent] = [Continent(name: "Todas", isSelected: true),
-                                              Continent(name: "África"),
-                                              Continent(name: "América"),
-                                              Continent(name: "Ásia"),
-                                              Continent(name: "Europa"),
-                                              Continent(name: "Oceania"),
-                                              Continent(name: "Antártida"),
-    ]
+    weak var delegate: CountriesViewModelProtocol?
     
-    private var countrieList: [Country] = [Country(name: "Brasil",
-                                                     capital: "Brasília",
-                                                     region: Region(name: "América do Sul"),
-                                                     continent: Continent(name: "América"),
-                                                     area: "8.515.767",
-                                                     borders: ["Argentina",
-                                                               "Bolívia",
-                                                               "Colômbia",
-                                                               "Guiana",
-                                                               "Guiana Francesa",
-                                                               "Paraguai",
-                                                               "Peru",
-                                                               "Suriname",
-                                                               "Uruguai",
-                                                               "Venezuela"],
-                                                     languages: ["Português"],
-                                                     population: "213.421.037",
-                                                     coin: "R$",
-                                                     flag: "br",
-                                                     isFavorited: false),
-                                            Country(name: "Argentina",
-                                                     capital: "Buenos Aires",
-                                                     region: Region(name: "América do Sul"),
-                                                     continent: Continent(name: "América"),
-                                                     area: "2.780.400",
-                                                     borders: ["Brasil",
-                                                               "Chile",
-                                                               "Paraguai",
-                                                               "Bolívia",
-                                                               "Uruguai"],
-                                                     languages: ["Espanhol",
-                                                                 "Guarani"],
-                                                     population: "45.808.747",
-                                                     coin: "$",
-                                                     flag: "ar",
-                                                     isFavorited: false),
-                                            Country(name: "Canadá",
-                                                     capital: "Ottawa",
-                                                     region: Region(name: "América do Norte"),
-                                                     continent: Continent(name: "América"),
-                                                     area: "9.984.670",
-                                                     borders: ["Estados Unidos"],
-                                                     languages: ["Inglês",
-                                                                 "Francês"],
-                                                     population: "38.246.108",
-                                                     coin: "$",
-                                                     flag: "ca",
-                                                     isFavorited: false),
-                                            Country(name: "Espanha",
-                                                     capital: "Madrid",
-                                                     region: Region(name: "Europa Ocidental"),
-                                                     continent: Continent(name: "Europa"),
-                                                     area: "505.990",
-                                                     borders: ["Portugal",
-                                                               "França",
-                                                               "Andorra",
-                                                               "Marrocos"],
-                                                     languages: ["Espanhol"],
-                                                     population: "47.615.034",
-                                                     coin: "€",
-                                                     flag: "es",
-                                                     isFavorited: false),
-                                            Country(name: "Itália",
-                                                     capital: "Roma",
-                                                     region: Region(name: "Europa Meridional"),
-                                                     continent: Continent(name: "Europa"),
-                                                     area: "301.340",
-                                                     borders: ["França",
-                                                               "Suíça",
-                                                               "Áustria",
-                                                               "Eslovênia",
-                                                               "San Marino",
-                                                               "Vaticano"],
-                                                     languages: ["Italiano"],
-                                                     population: "58.870.762",
-                                                     coin: "€",
-                                                     flag: "it",
-                                                     isFavorited: false),
-                                            Country(name: "Japão",
-                                                     capital: "Tokyo",
-                                                     region: Region(name: "Leste Asiático"),
-                                                     continent: Continent(name: "Ásia"),
-                                                     area: "377.975",
-                                                     borders: ["Nenhuma"],
-                                                     languages: ["Japonês"],
-                                                     population: "125.836.021",
-                                                     coin: "¥",
-                                                     flag: "jp",
-                                                     isFavorited: false)
-    ]
+    private var continents: [Continent] = []
+    
+    private var countries: [Country] = []
+    private var favorites: Set<String> = ["BR", "AR", "IT", "AI"]
     
     private var filteredCountries: [Country] = []
     private var currentSearchText: String = ""
     private var selectedContinentIndex: Int = 0
     
-    init() {
-        self.filteredCountries = countrieList
-    }
-    
+    // Aplica os filtros atuais de continente e busca sobre a lista completa de paises.
     private func applyFilters() {
-        var result = countrieList
-        
-        let selectedContinent = continent(at: selectedContinentIndex).name
-        
-        if selectedContinent != "Todas" {
-            result = result.filter { $0.continent.name == selectedContinent }
+        var result = countries
+
+        if let selectedRegion = continent(at: selectedContinentIndex).apiRegion {
+            result = result.filter { $0.continent == selectedRegion }
         }
-        
+
         let search = currentSearchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        
+
         if !search.isEmpty {
             result = result.filter {
                 $0.name.localizedCaseInsensitiveContains(search)
             }
         }
-        
+
         filteredCountries = result
     }
     
+    // Atualiza o estado visual de selecao dos filtros de continente.
     private func applyContinentSelection(oldIndex: Int, newIndex: Int) {
-        continentList[oldIndex].isSelected = false
-        continentList[newIndex].isSelected = true
+        continents[oldIndex].isSelected = false
+        continents[newIndex].isSelected = true
     }
     
+    // Retorna a quantidade de paises que a tabela deve exibir apos os filtros.
     var numberOfRowsInSection: Int {
         filteredCountries.count
     }
     
+    // Retorna a quantidade de continentes que a collection view de filtros deve exibir.
     var numberOfItemsInSection: Int {
-        continentList.count
+        continents.count
     }
     
+    // Indica se a tela deve mostrar a mensagem de lista vazia.
     var shouldShowEmptyState: Bool {
         filteredCountries.isEmpty
     }
     
+    // Define a mensagem de estado vazio com base no filtro ou texto de busca atual.
     var emptyStateMessage: String {
         if !currentSearchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return "Ops! Nenhum país chamado \(currentSearchText) foi encontrado, tente novamente!"
@@ -167,23 +78,28 @@ final class CountriesViewModel {
         return "Nenhum país encontrado."
     }
     
+    // Retorna o pais filtrado na posicao informada para configurar a celula ou detalhe.
     func country(at index: Int) -> Country {
         return filteredCountries[index]
     }
     
+    // Alterna o estado de favorito do pais exibido na posicao informada.
     func toggleFavorite(at index: Int) {
-        filteredCountries[index].isFavorited.toggle()
+        filteredCountries[index].isFavorite.toggle()
     }
     
+    // Retorna o continente na posicao informada para configurar a celula de filtro.
     func continent(at index: Int) -> Continent {
-        return continentList[index]
+        return continents[index]
     }
     
+    // Guarda o texto digitado na busca e reaplica os filtros da lista.
     func searchCountries(with text: String) {
         currentSearchText = text
         applyFilters()
     }
     
+    // Seleciona um continente, reaplica os filtros e informa quais celulas precisam ser recarregadas.
     func didSelectContinent(at index: Int) -> (oldIndex: Int, newIndex: Int)? {
         guard selectedContinentIndex != index else { return nil }
         
@@ -194,5 +110,42 @@ final class CountriesViewModel {
         applyFilters()
         
         return (oldIndex, index)
+    }
+    
+    // Busca os paises na API, converte a resposta para o modelo da tela e monta os filtros de continente.
+    func fetchCountries() {
+        CountriesService.fetchCountries { [weak self] result  in
+            guard let self else { return }
+            switch result {
+            case .success(let countriesResponse):
+                let favorites = favorites
+                countries = countriesResponse.map({ country in
+                    let region = country.subregion.isEmpty ? "Não informada" : country.subregion
+                    return Country(cca2: country.cca2,
+                                capital: country.capital.first ?? "Não informada",
+                                continent: country.region,
+                                region: region,
+                                name: country.name.common,
+                                flag: country.flags.png,
+                                isFavorite: favorites.contains(country.cca2))
+                })
+                
+                let continents = Array(Set(countries.map { $0.continent })).sorted()
+
+                self.continents = [Continent(name: "Todas", apiRegion: nil, isSelected: true)] +
+                    continents.map { region in
+                        Continent(
+                            name: RegionFormatter.title(for: region),
+                            apiRegion: region
+                        )
+                    }
+
+                self.applyFilters()
+                
+                self.delegate?.countriesViewModelUpdateUI()
+            case .failure(let error):
+                print(error)
+            }
+        }
     }
 }

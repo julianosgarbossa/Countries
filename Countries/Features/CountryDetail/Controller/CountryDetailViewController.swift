@@ -93,7 +93,7 @@ extension CountryDetailViewController: UICollectionViewDataSource {
         case .languages:
             cell.setupCell(language: countryDetailViewModel.language(at: indexPath.item))
         case .borders:
-            cell.setupCell(border: countryDetailViewModel.border(at: indexPath.item))
+            cell.setupCell(borderCountry: countryDetailViewModel.borderCountry(at: indexPath.item))
         }
         
         return cell

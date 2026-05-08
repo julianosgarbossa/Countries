@@ -12,20 +12,6 @@ enum BorderCellContentVariant {
     case language
 }
 
-private enum CountryBorderFlagMapper {
-    static func assetName(forPortugueseCountryName name: String) -> String? {
-        let map: [String: String] = [
-            "Argentina": "ar",
-            "Brasil": "br",
-            "Canadá": "ca",
-            "Espanha": "es",
-            "Itália": "it",
-            "Japão": "jp"
-        ]
-        return map[name]
-    }
-}
-
 class BorderCollectionViewCellScreen: UIView {
 
     private var flagWidthConstraint: NSLayoutConstraint?
@@ -88,50 +74,61 @@ class BorderCollectionViewCellScreen: UIView {
         ])
     }
 
-    func configure(title: String, variant: BorderCellContentVariant) {
-        borderNameLabel.text = title
-
-        switch variant {
-        case .countryBorder:
-            flagImageView.isHidden = false
-            borderNameLabel.textAlignment = .natural
-            borderNameLabel.setContentHuggingPriority(.required, for: .horizontal)
-            flagWidthConstraint?.constant = BorderCollectionViewCell.countryFlagWidth
-            flagHeightConstraint?.constant = BorderCollectionViewCell.countryBorderHeight
-            labelLeadingConstraint?.constant = 14
-            flagImageView.layer.cornerRadius = BorderCollectionViewCell.countryBorderHeight / 2
-            flagImageView.layer.maskedCorners = [
-                .layerMinXMinYCorner,
-                .layerMaxXMinYCorner,
-                .layerMinXMaxYCorner,
-                .layerMaxXMaxYCorner
-            ]
-            applyFlagImage(forCountryName: title)
-
-        case .language:
-            flagImageView.isHidden = false
-            borderNameLabel.textAlignment = .left
-            borderNameLabel.setContentHuggingPriority(.required, for: .horizontal)
-            flagWidthConstraint?.constant = BorderCollectionViewCell.languageIconSize + 18
-            flagHeightConstraint?.constant = BorderCollectionViewCell.languageIconSize
-            labelLeadingConstraint?.constant = 14
-            flagImageView.layer.cornerRadius = 0
-            applyLanguageIcon()
-        }
+    func prepareForReuse() {
+        flagImageView.cancelImageLoad()
+        flagImageView.image = nil
+        borderNameLabel.text = nil
+    }
+    
+    func configure(language: String) {
+        borderNameLabel.text = language
+        flagImageView.isHidden = false
+        borderNameLabel.textAlignment = .left
+        borderNameLabel.setContentHuggingPriority(.required, for: .horizontal)
+        flagWidthConstraint?.constant = BorderCollectionViewCell.languageIconSize + 18
+        flagHeightConstraint?.constant = BorderCollectionViewCell.languageIconSize
+        labelLeadingConstraint?.constant = 14
+        flagImageView.layer.cornerRadius = 0
+        applyLanguageIcon()
+    }
+    
+    func configure(borderCountry: BorderCountry) {
+        borderNameLabel.text = borderCountry.name
+        flagImageView.isHidden = false
+        borderNameLabel.textAlignment = .natural
+        borderNameLabel.setContentHuggingPriority(.required, for: .horizontal)
+        flagWidthConstraint?.constant = BorderCollectionViewCell.countryFlagWidth
+        flagHeightConstraint?.constant = BorderCollectionViewCell.countryBorderHeight
+        labelLeadingConstraint?.constant = 14
+        flagImageView.layer.cornerRadius = BorderCollectionViewCell.countryBorderHeight / 2
+        flagImageView.layer.maskedCorners = [
+            .layerMinXMinYCorner,
+            .layerMaxXMinYCorner,
+            .layerMinXMaxYCorner,
+            .layerMaxXMaxYCorner
+        ]
+        applyFlagImage(urlString: borderCountry.flagURL)
     }
 
-    private func applyFlagImage(forCountryName name: String) {
-        if let asset = CountryBorderFlagMapper.assetName(forPortugueseCountryName: name),
-           let image = UIImage(named: asset) {
-            flagImageView.image = image
-            flagImageView.tintColor = nil
-            flagImageView.backgroundColor = .clear
-            flagImageView.contentMode = .scaleAspectFill
+    private func applyFlagImage(urlString: String) {
+        guard !urlString.isEmpty else {
+            applyFlagPlaceholder()
             return
         }
-
+        
+        flagImageView.tintColor = nil
+        flagImageView.contentMode = .scaleAspectFill
+        flagImageView.backgroundColor = .clear
+        flagImageView.downloadImage(
+            urlString: urlString,
+            placeholderImage: UIImage(systemName: "globe.americas.fill"),
+            errorImage: UIImage(systemName: "globe.americas.fill")
+        )
+    }
+    
+    private func applyFlagPlaceholder() {
         let config = UIImage.SymbolConfiguration(pointSize: 18, weight: .medium)
-        flagImageView.image = UIImage(systemName: "globe.europe.africa.fill", withConfiguration: config)
+        flagImageView.image = UIImage(systemName: "globe.americas.fill", withConfiguration: config)
         flagImageView.tintColor = UIColor(red: 160/255, green: 164/255, blue: 172/255, alpha: 1)
         flagImageView.contentMode = .scaleAspectFit
         flagImageView.backgroundColor = UIColor(red: 245/255, green: 246/255, blue: 248/255, alpha: 1)

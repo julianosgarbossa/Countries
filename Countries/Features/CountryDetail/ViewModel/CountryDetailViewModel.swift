@@ -17,6 +17,7 @@ final class CountryDetailViewModel {
     
     private let countryId: String
     private var countryDetail: CountryDetail?
+    private var borderCountries: [BorderCountry] = []
     
     init(countryId: String) {
         self.countryId = countryId
@@ -43,7 +44,7 @@ final class CountryDetailViewModel {
     }
     
     var bordersCount: Int {
-        return borders.count
+        return borderCountries.count
     }
 
     func language(at index: Int) -> String {
@@ -51,7 +52,11 @@ final class CountryDetailViewModel {
     }
 
     func border(at index: Int) -> String {
-        return borders[index]
+        return borderCountries[index].name
+    }
+    
+    func borderCountry(at index: Int) -> BorderCountry {
+        return borderCountries[index]
     }
     
     func didTapFavorite() {
@@ -67,11 +72,40 @@ final class CountryDetailViewModel {
             case .success(let response):
                 let detail = response.toCountryDetail(isFavorited: false)
                 self.countryDetail = detail
-                print(detail)
+                self.borderCountries = []
                 self.delegate?.countryDetailDidUpdate()
+                self.fetchBorderCountries(countryCodes: detail.borders)
             case .failure(let error):
                 print(error)
             }
+        }
+    }
+    
+    private func fetchBorderCountries(countryCodes: [String]) {
+        guard !countryCodes.isEmpty else {
+            borderCountries = [
+                BorderCountry(code: "", name: "Não possui", flagURL: "")
+            ]
+            delegate?.countryDetailDidUpdate()
+            return
+        }
+        
+        BorderCountriesService.fetchBorderCountries(countryCodes: countryCodes) { [weak self] result in
+            guard let self else { return }
+            
+            switch result {
+            case .success(let response):
+                self.borderCountries = response
+                    .map { $0.toBorderCountry() }
+                    .sorted { $0.name < $1.name }
+            case .failure(let error):
+                print(error)
+                self.borderCountries = countryCodes.map {
+                    BorderCountry(code: $0, name: $0, flagURL: "")
+                }
+            }
+            
+            self.delegate?.countryDetailDidUpdate()
         }
     }
     
@@ -79,11 +113,5 @@ final class CountryDetailViewModel {
         guard let languages = countryDetail?.languages?.values.sorted() else { return [] }
         
         return languages.isEmpty ? ["Não informada"] : languages
-    }
-    
-    private var borders: [String] {
-        guard let borders = countryDetail?.borders else { return [] }
-        
-        return borders.isEmpty ? ["Não informada"] : borders
     }
 }

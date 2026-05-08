@@ -40,6 +40,11 @@ class BorderCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        borderCollectionViewCellScreen.prepareForReuse()
+    }
+    
     private func addVisualElements() {
         contentView.addSubview(borderCollectionViewCellScreen)
 
@@ -51,14 +56,14 @@ class BorderCollectionViewCell: UICollectionViewCell {
         ])
     }
     
-    func setupCell(border: String) {
+    func setupCell(borderCountry: BorderCountry) {
         borderCollectionViewCellScreen.layer.cornerRadius = Self.countryBorderHeight / 2
-        borderCollectionViewCellScreen.configure(title: border, variant: .countryBorder)
+        borderCollectionViewCellScreen.configure(borderCountry: borderCountry)
     }
 
     func setupCell(language: String) {
         borderCollectionViewCellScreen.layer.cornerRadius = Self.languageHeight / 2
-        borderCollectionViewCellScreen.configure(title: language, variant: .language)
+        borderCollectionViewCellScreen.configure(language: language)
     }
 
     static func calculateSize(title: String, variant: BorderCellContentVariant) -> CGSize {

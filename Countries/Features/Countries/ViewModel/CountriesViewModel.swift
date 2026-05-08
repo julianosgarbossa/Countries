@@ -18,11 +18,12 @@ final class CountriesViewModel {
     private var continents: [Continent] = []
     
     private var countries: [Country] = []
-    private var favorites: Set<String> = ["BR", "AR", "IT", "AI"]
+    private let favoritesLocalStorage = FavoritesLocalStorage.shared
     
     private var filteredCountries: [Country] = []
     private var currentSearchText: String = ""
     private var selectedContinentIndex: Int = 0
+    private var hasLoadedCountries: Bool = false
     
     // Aplica os filtros atuais de continente e busca sobre a lista completa de paises.
     private func applyFilters() {
@@ -61,11 +62,15 @@ final class CountriesViewModel {
     
     // Indica se a tela deve mostrar a mensagem de lista vazia.
     var shouldShowEmptyState: Bool {
-        filteredCountries.isEmpty
+        hasLoadedCountries && filteredCountries.isEmpty
     }
     
     // Define a mensagem de estado vazio com base no filtro ou texto de busca atual.
     var emptyStateMessage: String {
+        guard !continents.isEmpty else {
+            return "Nenhum país encontrado."
+        }
+        
         if !currentSearchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return "Ops! Nenhum país chamado \(currentSearchText) foi encontrado, tente novamente!"
         }
@@ -85,7 +90,21 @@ final class CountriesViewModel {
     
     // Alterna o estado de favorito do pais exibido na posicao informada.
     func toggleFavorite(at index: Int) {
-        filteredCountries[index].isFavorite.toggle()
+        let countryId = filteredCountries[index].cca2
+        let isFavorite = favoritesLocalStorage.toggle(countryId)
+        updateFavoriteState(countryId: countryId, isFavorite: isFavorite)
+    }
+    
+    func refreshFavoritesState() {
+        guard !continents.isEmpty else { return }
+        
+        let favoriteIds = favoritesLocalStorage.allIds()
+        countries = countries.map { country in
+            var country = country
+            country.isFavorite = favoriteIds.contains(country.cca2)
+            return country
+        }
+        applyFilters()
     }
     
     // Retorna o continente na posicao informada para configurar a celula de filtro.
@@ -118,7 +137,8 @@ final class CountriesViewModel {
             guard let self else { return }
             switch result {
             case .success(let countriesResponse):
-                let favorites = favorites
+                self.hasLoadedCountries = true
+                let favorites = favoritesLocalStorage.allIds()
                 countries = countriesResponse.map({ country in
                     let region = country.subregion.isEmpty ? "Não informada" : country.subregion
                     return Country(cca2: country.cca2,
@@ -144,8 +164,20 @@ final class CountriesViewModel {
                 
                 self.delegate?.countriesViewModelUpdateUI()
             case .failure(let error):
+                self.hasLoadedCountries = true
                 print(error)
+                self.delegate?.countriesViewModelUpdateUI()
             }
+        }
+    }
+    
+    private func updateFavoriteState(countryId: String, isFavorite: Bool) {
+        if let index = countries.firstIndex(where: { $0.cca2 == countryId }) {
+            countries[index].isFavorite = isFavorite
+        }
+        
+        if let index = filteredCountries.firstIndex(where: { $0.cca2 == countryId }) {
+            filteredCountries[index].isFavorite = isFavorite
         }
     }
 }

@@ -24,7 +24,10 @@ class CountriesViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         configNavigationControler()
+        countriesViewModel.refreshFavoritesState()
+        updateCountriesListUI()
     }
     
     private func configNavigationControler() {
@@ -121,7 +124,7 @@ extension CountriesViewController: CountrieTableViewCellDelegate {
 
 extension CountriesViewController: CountriesViewModelProtocol {
     func countriesViewModelUpdateUI() {
-        countriesScreen?.reloadTableView()
         countriesScreen?.reloadCollectionView()
+        updateCountriesListUI()
     }
 }

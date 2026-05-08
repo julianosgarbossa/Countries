@@ -35,6 +35,17 @@ class FavoritesScreen: UIView {
         return collectionView
     }()
     
+    private lazy var emptyStateLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        label.isHidden = true
+        return label
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         addVisualElements()
@@ -49,6 +60,7 @@ class FavoritesScreen: UIView {
         
         addSubview(cardFavoritesCountriesView)
         cardFavoritesCountriesView.addSubview(favoritesCountriesCollectionView)
+        cardFavoritesCountriesView.addSubview(emptyStateLabel)
         
         configConstraints()
     }
@@ -64,11 +76,30 @@ class FavoritesScreen: UIView {
             favoritesCountriesCollectionView.leadingAnchor.constraint(equalTo: cardFavoritesCountriesView.leadingAnchor, constant: 12),
             favoritesCountriesCollectionView.trailingAnchor.constraint(equalTo: cardFavoritesCountriesView.trailingAnchor, constant: -12),
             favoritesCountriesCollectionView.bottomAnchor.constraint(equalTo: cardFavoritesCountriesView.bottomAnchor),
+            
+            emptyStateLabel.centerYAnchor.constraint(equalTo: cardFavoritesCountriesView.centerYAnchor),
+            emptyStateLabel.leadingAnchor.constraint(equalTo: cardFavoritesCountriesView.leadingAnchor, constant: 24),
+            emptyStateLabel.trailingAnchor.constraint(equalTo: cardFavoritesCountriesView.trailingAnchor, constant: -24),
         ])
     }
     
     func configCollectionView(delegate: UICollectionViewDelegate, dataSource: UICollectionViewDataSource) {
         favoritesCountriesCollectionView.delegate = delegate
         favoritesCountriesCollectionView.dataSource = dataSource
+    }
+    
+    func reloadCollectionView() {
+        favoritesCountriesCollectionView.reloadData()
+    }
+    
+    func showEmptyState(message: String) {
+        emptyStateLabel.text = message
+        emptyStateLabel.isHidden = false
+        favoritesCountriesCollectionView.isHidden = true
+    }
+    
+    func hideEmptyState() {
+        emptyStateLabel.isHidden = true
+        favoritesCountriesCollectionView.isHidden = false
     }
 }

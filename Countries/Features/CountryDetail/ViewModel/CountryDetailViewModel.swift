@@ -16,6 +16,7 @@ final class CountryDetailViewModel {
     weak var delegate: CountryDetailViewModelDelegate?
     
     private let countryId: String
+    private let favoritesLocalStorage = FavoritesLocalStorage.shared
     private var countryDetail: CountryDetail?
     private var borderCountries: [BorderCountry] = []
     
@@ -60,7 +61,10 @@ final class CountryDetailViewModel {
     }
     
     func didTapFavorite() {
-        countryDetail?.isFavorited.toggle()
+        guard let countryDetail else { return }
+        
+        let isFavorited = favoritesLocalStorage.toggle(countryDetail.cca2)
+        self.countryDetail?.isFavorited = isFavorited
         delegate?.countryDetailDidUpdate()
     }
     
@@ -70,7 +74,7 @@ final class CountryDetailViewModel {
             
             switch result {
             case .success(let response):
-                let detail = response.toCountryDetail(isFavorited: false)
+                let detail = response.toCountryDetail(isFavorited: self.favoritesLocalStorage.contains(response.cca2))
                 self.countryDetail = detail
                 self.borderCountries = []
                 self.delegate?.countryDetailDidUpdate()

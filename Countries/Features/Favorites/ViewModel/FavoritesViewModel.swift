@@ -8,103 +8,81 @@
 import Foundation
 
 final class FavoritesViewModel {
-//    private var countryFavoriteList: [Country] = [Country(name: "Brasil",
-//                                                     capital: "Brasília",
-//                                                     region: Region(name: "América do Sul"),
-//                                                     continent: Continent(name: "América"),
-//                                                     area: "8.515.767",
-//                                                     borders: ["Argentina",
-//                                                               "Bolívia",
-//                                                               "Colômbia",
-//                                                               "Guiana",
-//                                                               "Guiana Francesa",
-//                                                               "Paraguai",
-//                                                               "Peru",
-//                                                               "Suriname",
-//                                                               "Uruguai",
-//                                                               "Venezuela"],
-//                                                     languages: ["Português"],
-//                                                     population: "213.421.037",
-//                                                     coin: "R$",
-//                                                     flag: "br",
-//                                                     isFavorited: true),
-//                                            Country(name: "Argentina",
-//                                                    capital: "Buenos Aires",
-//                                                     region: Region(name: "América do Sul"),
-//                                                     continent: Continent(name: "América"),
-//                                                     area: "2.780.400",
-//                                                     borders: ["Brasil",
-//                                                               "Chile",
-//                                                               "Paraguai",
-//                                                               "Bolívia",
-//                                                               "Uruguai"],
-//                                                     languages: ["Espanhol",
-//                                                                 "Guarani"],
-//                                                     population: "45.808.747",
-//                                                     coin: "$",
-//                                                     flag: "ar",
-//                                                     isFavorited: true),
-//                                            Country(name: "Canadá",
-//                                                     capital: "Ottawa",
-//                                                     region: Region(name: "América do Norte"),
-//                                                     continent: Continent(name: "América"),
-//                                                     area: "9.984.670",
-//                                                     borders: ["Estados Unidos"],
-//                                                     languages: ["Inglês",
-//                                                                 "Francês"],
-//                                                     population: "38.246.108",
-//                                                     coin: "$",
-//                                                     flag: "ca",
-//                                                     isFavorited: true),
-//                                            Country(name: "Espanha",
-//                                                     capital: "Madrid",
-//                                                     region: Region(name: "Europa Ocidental"),
-//                                                     continent: Continent(name: "Europa"),
-//                                                     area: "505.990",
-//                                                     borders: ["Portugal",
-//                                                               "França",
-//                                                               "Andorra",
-//                                                               "Marrocos"],
-//                                                     languages: ["Espanhol"],
-//                                                     population: "47.615.034",
-//                                                     coin: "€",
-//                                                     flag: "es",
-//                                                     isFavorited: true),
-//                                            Country(name: "Itália",
-//                                                     capital: "Roma",
-//                                                     region: Region(name: "Europa Meridional"),
-//                                                     continent: Continent(name: "Europa"),
-//                                                     area: "301.340",
-//                                                     borders: ["França",
-//                                                               "Suíça",
-//                                                               "Áustria",
-//                                                               "Eslovênia",
-//                                                               "San Marino",
-//                                                               "Vaticano"],
-//                                                     languages: ["Italiano"],
-//                                                     population: "58.870.762",
-//                                                     coin: "€",
-//                                                     flag: "it",
-//                                                     isFavorited: true),
-//                                            Country(name: "Japão",
-//                                                     capital: "Tokyo",
-//                                                     region: Region(name: "Leste Asiático"),
-//                                                     continent: Continent(name: "Ásia"),
-//                                                     area: "377.975",
-//                                                     borders: ["Nenhuma"],
-//                                                     languages: ["Japonês"],
-//                                                     population: "125.836.021",
-//                                                     coin: "¥",
-//                                                     flag: "jp",
-//                                                     isFavorited: true)
-//    ]
+    
+    private let favoritesLocalStorage = FavoritesLocalStorage.shared
+    private var favoriteCountries: [Country] = []
     
     var numberOfItemsInSection: Int {
-        return 1
-//        countryFavoriteList.count
+        favoriteCountries.count
     }
     
-//    func country(at index: Int) -> Country {
-//        return countryFavoriteList[index]
-//    }
+    var shouldShowEmptyState: Bool {
+        favoriteCountries.isEmpty
+    }
+    
+    var emptyStateMessage: String {
+        "Nenhum país favorito ainda."
+    }
+    
+    func countryIfAvailable(at index: Int) -> Country? {
+        guard favoriteCountries.indices.contains(index) else { return nil }
+        
+        return favoriteCountries[index]
+    }
+    
+    func fetchFavorites(completion: @escaping () -> Void) {
+        let favoriteIds = Array(favoritesLocalStorage.allIds()).sorted()
+        let favoriteIdsSet = Set(favoriteIds)
+        let previousVisibleIds = Set(favoriteCountries.map { $0.cca2 })
+        
+        favoriteCountries = favoriteCountries.filter {
+            favoriteIdsSet.contains($0.cca2)
+        }
+        
+        let currentVisibleIds = Set(favoriteCountries.map { $0.cca2 })
+        let didUpdateVisibleList = previousVisibleIds != currentVisibleIds
+        
+        if didUpdateVisibleList {
+            completion()
+        }
+        
+        guard !favoriteIds.isEmpty else {
+            favoriteCountries = []
+            
+            if !didUpdateVisibleList {
+                completion()
+            }
+            return
+        }
+        
+        FavoritesService.fetchFavoriteCountries(countryIds: favoriteIds) { [weak self] result in
+            guard let self else { return }
+            
+            switch result {
+            case .success(let countriesResponse):
+                let currentFavoriteIds = self.favoritesLocalStorage.allIds()
+                
+                self.favoriteCountries = countriesResponse
+                    .filter { currentFavoriteIds.contains($0.cca2) }
+                    .map { country in
+                        let region = country.subregion.isEmpty ? "Não informada" : country.subregion
+                        return Country(
+                            cca2: country.cca2,
+                            capital: country.capital.first ?? "Não informada",
+                            continent: country.region,
+                            region: region,
+                            name: country.name.common,
+                            flag: country.flags.png,
+                            isFavorite: true
+                        )
+                    }
+                    .sorted { $0.name < $1.name }
+            case .failure(let error):
+                print(error)
+                self.favoriteCountries = []
+            }
+            
+            completion()
+        }
+    }
 }

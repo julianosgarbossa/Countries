@@ -8,6 +8,8 @@
 import UIKit
 
 class TabBarController: UITabBarController {
+    private let accentColor = UIColor(red: 253/255, green: 155/255, blue: 1/255, alpha: 1)
+    private let grayTextColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,15 +29,31 @@ class TabBarController: UITabBarController {
         let navController = UINavigationController(rootViewController: viewController)
         navController.tabBarItem.title = title
         navController.tabBarItem.image = UIImage(systemName: imageName)
+        customizeNavigationBarAppearance(navController.navigationBar)
         return navController
     }
     
     private func customizeTabBarAppearance() {
-        tabBar.tintColor = UIColor(red: 253/255, green: 155/255, blue: 1/255, alpha: 1)
-        tabBar.unselectedItemTintColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1)
+        tabBar.tintColor = accentColor
+        tabBar.unselectedItemTintColor = grayTextColor
         tabBar.backgroundColor = .white
         tabBar.isTranslucent = false
-        tabBar.layer.borderColor = UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1).cgColor
+        tabBar.layer.borderColor = grayTextColor.cgColor
         tabBar.layer.borderWidth = 0.5
+    }
+
+    private func customizeNavigationBarAppearance(_ navigationBar: UINavigationBar) {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = accentColor
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        appearance.shadowColor = .clear
+
+        navigationBar.standardAppearance = appearance
+        navigationBar.scrollEdgeAppearance = appearance
+        navigationBar.compactAppearance = appearance
+        navigationBar.tintColor = .white
+        navigationBar.isTranslucent = false
     }
 }

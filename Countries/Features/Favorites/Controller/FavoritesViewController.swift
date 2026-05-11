@@ -23,10 +23,13 @@ class FavoritesViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         configNavigationControler()
+        fetchFavorites()
     }
     
     private func configNavigationControler() {
+        navigationController?.navigationBar.isHidden = false
         navigationItem.title = "Países Favoritos"
         navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
     }
@@ -34,11 +37,27 @@ class FavoritesViewController: UIViewController {
     private func configProtocols() {
         favoritesScreen?.configCollectionView(delegate: self, dataSource: self)
     }
+    
+    private func fetchFavorites() {
+        favoritesViewModel.fetchFavorites { [weak self] in
+            guard let self else { return }
+            
+            self.favoritesScreen?.reloadCollectionView()
+            
+            if self.favoritesViewModel.shouldShowEmptyState {
+                self.favoritesScreen?.showEmptyState(message: self.favoritesViewModel.emptyStateMessage)
+            } else {
+                self.favoritesScreen?.hideEmptyState()
+            }
+        }
+    }
 }
 
 extension FavoritesViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let countrieDetailViewController = CountryDetailViewController(country: favoritesViewModel.country(at: indexPath.item))
+        guard let country = favoritesViewModel.countryIfAvailable(at: indexPath.item) else { return }
+        
+        let countrieDetailViewController = CountryDetailViewController(countryId: country.cca2)
         navigationController?.pushViewController(countrieDetailViewController, animated: true)
     }
 }
@@ -50,7 +69,12 @@ extension FavoritesViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CountryCollectionViewCell.identifier, for: indexPath) as? CountryCollectionViewCell else { return UICollectionViewCell() }
-        cell.setupCell(country: favoritesViewModel.country(at: indexPath.item))
+        
+        guard let country = favoritesViewModel.countryIfAvailable(at: indexPath.item) else {
+            return cell
+        }
+        
+        cell.setupCell(country: country)
         return cell
     }
 }

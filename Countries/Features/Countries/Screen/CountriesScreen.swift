@@ -21,7 +21,7 @@ class CountriesScreen: UIView {
         return search
     }()
     
-    private lazy var regionsCollectionView: UICollectionView = {
+    private lazy var continentCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumInteritemSpacing = 10
@@ -77,7 +77,7 @@ class CountriesScreen: UIView {
         backgroundColor = UIColor(red: 253/255, green: 155/255, blue: 1/255, alpha: 1)
         
         addSubview(countrieSearchBar)
-        addSubview(regionsCollectionView)
+        addSubview(continentCollectionView)
         addSubview(cardTableView)
         cardTableView.addSubview(countriesTableView)
         cardTableView.addSubview(emptyStateLabel)
@@ -92,12 +92,12 @@ class CountriesScreen: UIView {
             countrieSearchBar.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
             countrieSearchBar.heightAnchor.constraint(equalToConstant: 48),
             
-            regionsCollectionView.topAnchor.constraint(equalTo: countrieSearchBar.bottomAnchor, constant: 16),
-            regionsCollectionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            regionsCollectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            regionsCollectionView.heightAnchor.constraint(equalToConstant: 40),
+            continentCollectionView.topAnchor.constraint(equalTo: countrieSearchBar.bottomAnchor, constant: 16),
+            continentCollectionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            continentCollectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            continentCollectionView.heightAnchor.constraint(equalToConstant: 40),
             
-            cardTableView.topAnchor.constraint(equalTo: regionsCollectionView.bottomAnchor, constant: 16),
+            cardTableView.topAnchor.constraint(equalTo: continentCollectionView.bottomAnchor, constant: 16),
             cardTableView.leadingAnchor.constraint(equalTo: leadingAnchor),
             cardTableView.trailingAnchor.constraint(equalTo: trailingAnchor),
             cardTableView.bottomAnchor.constraint(equalTo: bottomAnchor),
@@ -118,8 +118,8 @@ class CountriesScreen: UIView {
     }
     
     func configCollectionView(delegate: UICollectionViewDelegate, dataSource: UICollectionViewDataSource) {
-        regionsCollectionView.delegate = delegate
-        regionsCollectionView.dataSource = dataSource
+        continentCollectionView.delegate = delegate
+        continentCollectionView.dataSource = dataSource
     }
     
     func configTableView(delegate: UITableViewDelegate, dataSource: UITableViewDataSource) {
@@ -129,6 +129,10 @@ class CountriesScreen: UIView {
     
     func reloadTableView() {
         countriesTableView.reloadData()
+    }
+    
+    func reloadCollectionView() {
+        continentCollectionView.reloadData()
     }
     
     func reloadTableViewRows(at indexPaths: [IndexPath], with animation: UITableView.RowAnimation) {

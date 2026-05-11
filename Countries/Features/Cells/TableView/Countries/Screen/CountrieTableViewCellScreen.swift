@@ -220,11 +220,11 @@ class CountrieTableViewCellScreen: UIView {
     }
     
     func configure(country: Country) {
-        countrieFlagImageView.image = UIImage(named: country.flag)
+        countrieFlagImageView.downloadImage(urlString: country.flag)
         countrieNameLabel.text = country.name
         countrieCapitalLabel.text = country.capital
-        countrieRegionLabel.text = country.region.name
-        configureFavoriteButton(isFavorited: country.isFavorited)
+        countrieRegionLabel.text = country.region
+        configureFavoriteButton(isFavorited: country.isFavorite)
     }
     
     private func configureFavoriteButton(isFavorited: Bool) {

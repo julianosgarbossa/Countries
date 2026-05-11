@@ -15,42 +15,107 @@ final class CountryDetailViewModel {
     
     weak var delegate: CountryDetailViewModelDelegate?
     
-    private var country: Country
+    private let countryId: String
+    private let favoritesLocalStorage = FavoritesLocalStorage.shared
+    private var countryDetail: CountryDetail?
+    private var borderCountries: [BorderCountry] = []
     
-    init(country: Country) {
-        self.country = country
+    init(countryId: String) {
+        self.countryId = countryId
     }
     
-    var countryDetailData: CountryDetailData {
-        CountryDetailData(flagName: country.flag,
-                          isFavorited: country.isFavorited,
-                          countryName: country.name,
-                          continentName: country.continent.name,
-                          areaText: "Área: \(country.area) km²",
-                          capitalText: country.capital,
-                          populationText: "\(country.population) pessoas",
-                          coinText: country.coin)
+    var countryDetailData: CountryDetail {
+        countryDetail ?? CountryDetail(
+            cca2: countryId,
+            flag: "",
+            isFavorited: false,
+            countryName: "Carregando...",
+            continentName: "-",
+            area: "Área: -",
+            borders: [],
+            capital: "-",
+            population: "-",
+            coin: "-",
+            languages: nil
+        )
     }
     
     var languagesCount: Int {
-        country.languages.count
+        return languages.count
     }
     
     var bordersCount: Int {
-        country.borders.count
+        return borderCountries.count
     }
 
     func language(at index: Int) -> String {
-        country.languages[index]
+        return languages[index]
     }
 
     func border(at index: Int) -> String {
-        country.borders[index]
+        return borderCountries[index].name
+    }
+    
+    func borderCountry(at index: Int) -> BorderCountry {
+        return borderCountries[index]
     }
     
     func didTapFavorite() {
-        country.isFavorited.toggle()
+        guard let countryDetail else { return }
+        
+        let isFavorited = favoritesLocalStorage.toggle(countryDetail.cca2)
+        self.countryDetail?.isFavorited = isFavorited
         delegate?.countryDetailDidUpdate()
-        // salvar isso em algum lugar banco/userdefaults...
+    }
+    
+    func fetchCountryDetail() {
+        CountryDetailService.fetchCountryDetail(countryId: countryId) { [weak self] result in
+            guard let self else { return }
+            
+            switch result {
+            case .success(let response):
+                let detail = response.toCountryDetail(isFavorited: self.favoritesLocalStorage.contains(response.cca2))
+                self.countryDetail = detail
+                self.borderCountries = []
+                self.delegate?.countryDetailDidUpdate()
+                self.fetchBorderCountries(countryCodes: detail.borders)
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
+    private func fetchBorderCountries(countryCodes: [String]) {
+        guard !countryCodes.isEmpty else {
+            borderCountries = [
+                BorderCountry(code: "", name: "Não possui", flagURL: "")
+            ]
+            delegate?.countryDetailDidUpdate()
+            return
+        }
+        
+        BorderCountriesService.fetchBorderCountries(countryCodes: countryCodes) { [weak self] result in
+            guard let self else { return }
+            
+            switch result {
+            case .success(let response):
+                self.borderCountries = response
+                    .map { $0.toBorderCountry() }
+                    .sorted { $0.name < $1.name }
+            case .failure(let error):
+                print(error)
+                self.borderCountries = countryCodes.map {
+                    BorderCountry(code: $0, name: $0, flagURL: "")
+                }
+            }
+            
+            self.delegate?.countryDetailDidUpdate()
+        }
+    }
+    
+    private var languages: [String] {
+        guard let languages = countryDetail?.languages?.values.sorted() else { return [] }
+        
+        return languages.isEmpty ? ["Não informada"] : languages
     }
 }

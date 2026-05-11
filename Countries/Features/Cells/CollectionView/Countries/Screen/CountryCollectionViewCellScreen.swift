@@ -76,8 +76,14 @@ class CountryCollectionViewCellScreen: UIView {
         ])
     }
     
+    func prepareForReuse() {
+        countrieFlagImageView.cancelImageLoad()
+        countrieFlagImageView.image = nil
+        countrieNameLabel.text = nil
+    }
+    
     func configure(country: Country) {
-        countrieFlagImageView.image = UIImage(named: country.flag)
+        countrieFlagImageView.downloadImage(urlString: country.flag)
         countrieNameLabel.text = country.name
     }
 }

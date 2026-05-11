@@ -12,8 +12,8 @@ class CountryDetailViewController: UIViewController {
     private var countryDetailScreen: CountryDetailScreen?
     private let countryDetailViewModel: CountryDetailViewModel
     
-    init(country: Country) {
-        countryDetailViewModel = CountryDetailViewModel(country: country)
+    init(countryId: String) {
+        countryDetailViewModel = CountryDetailViewModel(countryId: countryId)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -31,6 +31,7 @@ class CountryDetailViewController: UIViewController {
         configNavigationControler()
         configProtocols()
         configDetailScreen()
+        countryDetailViewModel.fetchCountryDetail()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -92,7 +93,7 @@ extension CountryDetailViewController: UICollectionViewDataSource {
         case .languages:
             cell.setupCell(language: countryDetailViewModel.language(at: indexPath.item))
         case .borders:
-            cell.setupCell(border: countryDetailViewModel.border(at: indexPath.item))
+            cell.setupCell(borderCountry: countryDetailViewModel.borderCountry(at: indexPath.item))
         }
         
         return cell
@@ -115,5 +116,6 @@ extension CountryDetailViewController: UICollectionViewDelegateFlowLayout {
 extension CountryDetailViewController: CountryDetailViewModelDelegate {
     func countryDetailDidUpdate() {
         configDetailScreen()
+        countryDetailScreen?.reloadCollectionViews()
     }
 }

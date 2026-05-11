@@ -39,11 +39,19 @@ class ProfileViewController: UIViewController {
     }
 
     private func loadProfileData() {
-        profileScreen?.configureProfile(
-            name: profileViewModel.userName,
-            email: profileViewModel.userEmail,
-            version: profileViewModel.appVersion
-        )
+        if profileViewModel.isLoggedIn {
+            profileScreen?.configureLoggedMode()
+            profileScreen?.configureProfile(
+                name: profileViewModel.userName,
+                email: profileViewModel.userEmail,
+                version: profileViewModel.appVersion
+            )
+            if let photoURL = profileViewModel.userPhotoURL {
+                profileScreen?.loadProfilePhoto(from: photoURL)
+            }
+        } else {
+            profileScreen?.configureGuestMode(version: profileViewModel.appVersion)
+        }
     }
 
     private func navigateToLogin() {
@@ -112,13 +120,17 @@ extension ProfileViewController: ProfileScreenDelegate {
         })
         present(alert, animated: true)
     }
+
+    func didTapLoginButton() {
+        navigateToLogin()
+    }
 }
 
 // MARK: - ProfileViewModelDelegate
 
 extension ProfileViewController: ProfileViewModelDelegate {
     func didLogoutSuccess() {
-        navigateToLogin()
+        loadProfileData()
     }
 
     func didLogoutFailure(message: String) {
@@ -132,7 +144,7 @@ extension ProfileViewController: ProfileViewModelDelegate {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
-            self?.navigateToLogin()
+            self?.loadProfileData()
         })
         present(alert, animated: true)
     }

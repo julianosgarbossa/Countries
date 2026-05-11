@@ -9,6 +9,7 @@ import Foundation
 
 protocol CountryDetailViewModelDelegate: AnyObject {
     func countryDetailDidUpdate()
+    func countryDetailDidChangeState(_ state: ViewState)
 }
 
 final class CountryDetailViewModel {
@@ -16,28 +17,18 @@ final class CountryDetailViewModel {
     weak var delegate: CountryDetailViewModelDelegate?
     
     private let countryId: String
-    private let favoritesLocalStorage = FavoritesLocalStorage.shared
+    private let favoritesRepository = FavoritesRepository.shared
     private var countryDetail: CountryDetail?
     private var borderCountries: [BorderCountry] = []
+
+    private(set) var state: ViewState = .idle
     
     init(countryId: String) {
         self.countryId = countryId
     }
     
-    var countryDetailData: CountryDetail {
-        countryDetail ?? CountryDetail(
-            cca2: countryId,
-            flag: "",
-            isFavorited: false,
-            countryName: "Carregando...",
-            continentName: "-",
-            area: "Área: -",
-            borders: [],
-            capital: "-",
-            population: "-",
-            coin: "-",
-            languages: nil
-        )
+    var countryDetailData: CountryDetail? {
+        countryDetail
     }
     
     var languagesCount: Int {
@@ -63,24 +54,30 @@ final class CountryDetailViewModel {
     func didTapFavorite() {
         guard let countryDetail else { return }
         
-        let isFavorited = favoritesLocalStorage.toggle(countryDetail.cca2)
+        let isFavorited = favoritesRepository.toggle(countryDetail.cca2)
         self.countryDetail?.isFavorited = isFavorited
         delegate?.countryDetailDidUpdate()
     }
     
     func fetchCountryDetail() {
+        state = .loading
+        delegate?.countryDetailDidChangeState(state)
+
         CountryDetailService.fetchCountryDetail(countryId: countryId) { [weak self] result in
             guard let self else { return }
             
             switch result {
             case .success(let response):
-                let detail = response.toCountryDetail(isFavorited: self.favoritesLocalStorage.contains(response.cca2))
+                let detail = response.toCountryDetail(isFavorited: self.favoritesRepository.contains(response.cca2))
                 self.countryDetail = detail
                 self.borderCountries = []
+                self.state = .loaded
+                self.delegate?.countryDetailDidChangeState(self.state)
                 self.delegate?.countryDetailDidUpdate()
                 self.fetchBorderCountries(countryCodes: detail.borders)
             case .failure(let error):
-                print(error)
+                self.state = .error(message: error.localizedDescription)
+                self.delegate?.countryDetailDidChangeState(self.state)
             }
         }
     }

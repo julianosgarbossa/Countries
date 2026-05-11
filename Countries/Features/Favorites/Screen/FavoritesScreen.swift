@@ -30,10 +30,14 @@ class FavoritesScreen: UIView {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.register(CountryCollectionViewCell.self, forCellWithReuseIdentifier: CountryCollectionViewCell.identifier)
+        collectionView.register(ShimmerCollectionViewCell.self, forCellWithReuseIdentifier: ShimmerCollectionViewCell.identifier)
         collectionView.backgroundColor = .clear
         collectionView.showsVerticalScrollIndicator = false
         return collectionView
     }()
+
+    private(set) var isShimmerActive = false
+    private let shimmerItemCount = 4
     
     private lazy var emptyStateLabel: UILabel = {
         let label = UILabel()
@@ -101,5 +105,20 @@ class FavoritesScreen: UIView {
     func hideEmptyState() {
         emptyStateLabel.isHidden = true
         favoritesCountriesCollectionView.isHidden = false
+    }
+
+    func showShimmer() {
+        isShimmerActive = true
+        favoritesCountriesCollectionView.isHidden = false
+        emptyStateLabel.isHidden = true
+        favoritesCountriesCollectionView.reloadData()
+    }
+
+    func hideShimmer() {
+        isShimmerActive = false
+    }
+
+    var shimmerCellCount: Int {
+        isShimmerActive ? shimmerItemCount : 0
     }
 }

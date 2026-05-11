@@ -9,6 +9,7 @@ import UIKit
 
 protocol RegisterScreenDelegate: AnyObject {
     func didTapRegisterButton()
+    func didTapEditPhotoButton()
 }
 
 enum RegisterFieldTag: Int {
@@ -282,8 +283,7 @@ class RegisterScreen: UIView {
     
     @objc
     func didTapEditPhotoButton(_ sender: UIButton) {
-        print("Editando foto...")
-        setPhotoImageView()
+        delegate?.didTapEditPhotoButton()
     }
     
     @objc
@@ -460,8 +460,8 @@ class RegisterScreen: UIView {
         registerButton.alpha = enabled ? 1.0 : 0.5
     }
     
-    private func setPhotoImageView() {
-        photoImageView.image = UIImage(named: "photo")
+    func setProfilePhoto(_ image: UIImage) {
+        photoImageView.image = image
         photoImageView.contentMode = .scaleAspectFill
     }
 

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CountryDetailResponse: Decodable {
+struct CountryDetailResponse: Codable, CountryDisplayable {
     let cca2: String
     let name: CountryName
     let flags: CountryFlag
@@ -18,17 +18,20 @@ struct CountryDetailResponse: Decodable {
     let population: Int
     let currencies: [String: CountryCurrency]?
     let languages: [String: String]?
+
+    var displayName: String { name.common }
+    var flagURL: String { flags.png }
 }
 
-struct CountryName: Decodable {
+struct CountryName: Codable {
     let common: String
 }
 
-struct CountryFlag: Decodable {
+struct CountryFlag: Codable {
     let png: String
 }
 
-struct CountryCurrency: Decodable {
+struct CountryCurrency: Codable {
     let name: String
     let symbol: String?
 }

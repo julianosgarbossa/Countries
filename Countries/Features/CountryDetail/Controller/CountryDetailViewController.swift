@@ -30,7 +30,6 @@ class CountryDetailViewController: UIViewController {
         super.viewDidLoad()
         configNavigationControler()
         configProtocols()
-        configDetailScreen()
         countryDetailViewModel.fetchCountryDetail()
     }
     
@@ -55,7 +54,8 @@ class CountryDetailViewController: UIViewController {
     }
     
     func configDetailScreen() {
-        countryDetailScreen?.updateUI(data: countryDetailViewModel.countryDetailData)
+        guard let data = countryDetailViewModel.countryDetailData else { return }
+        countryDetailScreen?.updateUI(data: data)
     }
 }
 
@@ -117,5 +117,21 @@ extension CountryDetailViewController: CountryDetailViewModelDelegate {
     func countryDetailDidUpdate() {
         configDetailScreen()
         countryDetailScreen?.reloadCollectionViews()
+    }
+
+    func countryDetailDidChangeState(_ state: ViewState) {
+        switch state {
+        case .loading:
+            countryDetailScreen?.showLoadingShimmer()
+        case .loaded:
+            countryDetailScreen?.hideLoadingShimmer()
+        case .error(let message):
+            countryDetailScreen?.hideLoadingShimmer()
+            let alert = UIAlertController(title: "Erro", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
+        default:
+            break
+        }
     }
 }

@@ -9,6 +9,7 @@ import UIKit
 
 protocol EditProfileScreenDelegate: AnyObject {
     func didTapSaveButton()
+    func didTapChangePhotoButton()
 }
 
 final class EditProfileScreen: UIView {
@@ -17,6 +18,45 @@ final class EditProfileScreen: UIView {
 
     func delegate(delegate: EditProfileScreenDelegate) {
         self.delegate = delegate
+    }
+
+    private let accentColor = UIColor(red: 253/255, green: 155/255, blue: 1/255, alpha: 1)
+
+    private lazy var photoContentView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .white
+        view.layer.cornerRadius = 40
+        view.clipsToBounds = true
+        view.layer.borderWidth = 2
+        view.layer.borderColor = accentColor.cgColor
+        return view
+    }()
+
+    private lazy var photoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.image = UIImage(systemName: "person.circle.fill")
+        imageView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 60, weight: .ultraLight)
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.tintColor = UIColor(red: 200/255, green: 200/255, blue: 200/255, alpha: 1)
+        imageView.layer.cornerRadius = 38
+        return imageView
+    }()
+
+    private lazy var changePhotoButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("Alterar foto", for: .normal)
+        button.setTitleColor(accentColor, for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        button.addTarget(self, action: #selector(didTapChangePhoto), for: .touchUpInside)
+        return button
+    }()
+
+    @objc private func didTapChangePhoto() {
+        delegate?.didTapChangePhotoButton()
     }
 
     private lazy var cardView: UIView = {
@@ -124,6 +164,9 @@ final class EditProfileScreen: UIView {
         backgroundColor = UIColor(red: 253/255, green: 155/255, blue: 1/255, alpha: 1)
 
         addSubview(cardView)
+        cardView.addSubview(photoContentView)
+        photoContentView.addSubview(photoImageView)
+        cardView.addSubview(changePhotoButton)
         cardView.addSubview(titleLabel)
         cardView.addSubview(descriptionLabel)
         cardView.addSubview(emailCaptionLabel)
@@ -138,7 +181,20 @@ final class EditProfileScreen: UIView {
             cardView.trailingAnchor.constraint(equalTo: trailingAnchor),
             cardView.bottomAnchor.constraint(equalTo: bottomAnchor),
 
-            titleLabel.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 24),
+            photoContentView.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 24),
+            photoContentView.centerXAnchor.constraint(equalTo: cardView.centerXAnchor),
+            photoContentView.widthAnchor.constraint(equalToConstant: 80),
+            photoContentView.heightAnchor.constraint(equalToConstant: 80),
+
+            photoImageView.centerXAnchor.constraint(equalTo: photoContentView.centerXAnchor),
+            photoImageView.centerYAnchor.constraint(equalTo: photoContentView.centerYAnchor),
+            photoImageView.widthAnchor.constraint(equalToConstant: 76),
+            photoImageView.heightAnchor.constraint(equalToConstant: 76),
+
+            changePhotoButton.topAnchor.constraint(equalTo: photoContentView.bottomAnchor, constant: 8),
+            changePhotoButton.centerXAnchor.constraint(equalTo: cardView.centerXAnchor),
+
+            titleLabel.topAnchor.constraint(equalTo: changePhotoButton.bottomAnchor, constant: 16),
             titleLabel.centerXAnchor.constraint(equalTo: cardView.centerXAnchor),
 
             descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
@@ -215,5 +271,15 @@ final class EditProfileScreen: UIView {
 
     func setFieldsEnabled(_ enabled: Bool) {
         nameTextField.isEnabled = enabled
+    }
+
+    func setProfilePhoto(_ image: UIImage) {
+        photoImageView.image = image
+        photoImageView.contentMode = .scaleAspectFill
+    }
+
+    func loadProfilePhoto(from url: URL) {
+        photoImageView.downloadImage(urlString: url.absoluteString)
+        photoImageView.contentMode = .scaleAspectFill
     }
 }

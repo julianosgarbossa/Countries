@@ -586,4 +586,68 @@ class CountryDetailScreen: UIView {
         populationLabel.text = data.population
         coinLabel.text = data.coin
     }
+
+    // MARK: - Shimmer overlay
+
+    private lazy var shimmerOverlay: UIView = {
+        let overlay = UIView()
+        overlay.translatesAutoresizingMaskIntoConstraints = false
+        overlay.backgroundColor = .white
+        return overlay
+    }()
+
+    private var shimmerViews: [ShimmerView] = []
+
+    func showLoadingShimmer() {
+        guard shimmerOverlay.superview == nil else { return }
+
+        addSubview(shimmerOverlay)
+        NSLayoutConstraint.activate([
+            shimmerOverlay.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            shimmerOverlay.leadingAnchor.constraint(equalTo: leadingAnchor),
+            shimmerOverlay.trailingAnchor.constraint(equalTo: trailingAnchor),
+            shimmerOverlay.bottomAnchor.constraint(equalTo: bottomAnchor),
+        ])
+
+        let flagShimmer = ShimmerView()
+        flagShimmer.translatesAutoresizingMaskIntoConstraints = false
+        flagShimmer.layer.cornerRadius = 0
+
+        let lines: [ShimmerView] = (0..<6).map { _ in
+            let v = ShimmerView()
+            v.translatesAutoresizingMaskIntoConstraints = false
+            return v
+        }
+
+        shimmerOverlay.addSubview(flagShimmer)
+        lines.forEach { shimmerOverlay.addSubview($0) }
+
+        NSLayoutConstraint.activate([
+            flagShimmer.topAnchor.constraint(equalTo: shimmerOverlay.topAnchor),
+            flagShimmer.leadingAnchor.constraint(equalTo: shimmerOverlay.leadingAnchor),
+            flagShimmer.trailingAnchor.constraint(equalTo: shimmerOverlay.trailingAnchor),
+            flagShimmer.heightAnchor.constraint(equalToConstant: 220),
+        ])
+
+        var previous: UIView = flagShimmer
+        for (i, line) in lines.enumerated() {
+            let widthMultiplier: CGFloat = i % 2 == 0 ? 0.7 : 0.5
+            NSLayoutConstraint.activate([
+                line.topAnchor.constraint(equalTo: previous.bottomAnchor, constant: 20),
+                line.leadingAnchor.constraint(equalTo: shimmerOverlay.leadingAnchor, constant: 20),
+                line.widthAnchor.constraint(equalTo: shimmerOverlay.widthAnchor, multiplier: widthMultiplier),
+                line.heightAnchor.constraint(equalToConstant: 16),
+            ])
+            previous = line
+        }
+
+        shimmerViews = [flagShimmer] + lines
+        shimmerViews.forEach { $0.startAnimating() }
+    }
+
+    func hideLoadingShimmer() {
+        shimmerViews.forEach { $0.stopAnimating() }
+        shimmerViews.removeAll()
+        shimmerOverlay.removeFromSuperview()
+    }
 }

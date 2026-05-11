@@ -7,8 +7,11 @@
 
 import Foundation
 
-struct BorderCountry {
+struct BorderCountry: CountryDisplayable {
     let code: String
     let name: String
     let flagURL: String
+
+    var cca2: String { code }
+    var displayName: String { name }
 }

@@ -126,6 +126,31 @@ extension RegisterViewController: RegisterScreenDelegate {
         view.endEditing(true)
         registerViewModel.register()
     }
+
+    func didTapEditPhotoButton() {
+        let picker = UIImagePickerController()
+        picker.sourceType = .photoLibrary
+        picker.delegate = self
+        picker.allowsEditing = true
+        present(picker, animated: true)
+    }
+}
+
+// MARK: - UIImagePickerControllerDelegate
+
+extension RegisterViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        let image = (info[.editedImage] as? UIImage) ?? (info[.originalImage] as? UIImage)
+        if let image {
+            registerScreen?.setProfilePhoto(image)
+            registerViewModel.profileImage = image
+        }
+        picker.dismiss(animated: true)
+    }
+
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true)
+    }
 }
 
 extension RegisterViewController: RegisterViewModelDelegate {

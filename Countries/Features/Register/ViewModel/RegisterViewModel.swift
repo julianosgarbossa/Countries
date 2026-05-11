@@ -5,7 +5,7 @@
 //  Created by Juliano Sgarbossa on 13/04/26.
 //
 
-import Foundation
+import UIKit
 
 protocol RegisterViewModelDelegate: AnyObject {
     func didUpdateFormVaidity(isValid: Bool)
@@ -30,6 +30,7 @@ final class RegisterViewModel {
     private var email: String?
     private var password: String?
     private var confirmPassword: String?
+    var profileImage: UIImage?
 
     func updateField(field: RegisterFieldType, value: String?) {
         switch field {
@@ -59,18 +60,50 @@ final class RegisterViewModel {
         delegate?.didChangeLoadingState(isLoading: true)
 
         AuthService.shared.register(email: email, password: password) { [weak self] result in
+            guard let self else { return }
+
             switch result {
             case .success:
-                AuthService.shared.updateDisplayName(name) { _ in
-                    DispatchQueue.main.async {
-                        self?.delegate?.didChangeLoadingState(isLoading: false)
-                        self?.delegate?.didRegisterSuccess()
+                AuthService.shared.updateDisplayName(name) { [weak self] _ in
+                    guard let self else { return }
+
+                    FavoritesRepository.shared.syncAfterLogin { [weak self] in
+                        guard let self else { return }
+                        if let image = self.profileImage {
+                            self.uploadProfilePhoto(image)
+                        } else {
+                            DispatchQueue.main.async {
+                                self.delegate?.didChangeLoadingState(isLoading: false)
+                                self.delegate?.didRegisterSuccess()
+                            }
+                        }
                     }
                 }
             case .failure(let error):
                 DispatchQueue.main.async {
-                    self?.delegate?.didChangeLoadingState(isLoading: false)
-                    self?.delegate?.didRegisterFailure(message: FirebaseErrorMapper.message(for: error))
+                    self.delegate?.didChangeLoadingState(isLoading: false)
+                    self.delegate?.didRegisterFailure(message: FirebaseErrorMapper.message(for: error))
+                }
+            }
+        }
+    }
+
+    private func uploadProfilePhoto(_ image: UIImage) {
+        StorageService.shared.uploadProfilePhoto(image) { [weak self] result in
+            guard let self else { return }
+
+            switch result {
+            case .success(let url):
+                AuthService.shared.updatePhotoURL(url) { _ in
+                    DispatchQueue.main.async {
+                        self.delegate?.didChangeLoadingState(isLoading: false)
+                        self.delegate?.didRegisterSuccess()
+                    }
+                }
+            case .failure:
+                DispatchQueue.main.async {
+                    self.delegate?.didChangeLoadingState(isLoading: false)
+                    self.delegate?.didRegisterSuccess()
                 }
             }
         }

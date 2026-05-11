@@ -14,6 +14,7 @@ protocol ProfileScreenDelegate: AnyObject {
     func didTapTermsOfUseButton()
     func didTapLogoutButton()
     func didTapDeleteAccountButton()
+    func didTapLoginButton()
 }
 
 class ProfileScreen: UIView {
@@ -222,6 +223,28 @@ class ProfileScreen: UIView {
         return button
     }()
 
+    // MARK: - Login CTA (guest)
+
+    private lazy var loginCTAButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("Entrar ou Cadastrar", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        button.titleLabel?.textAlignment = .center
+        button.titleLabel?.numberOfLines = 1
+        button.backgroundColor = accentColor
+        button.layer.cornerRadius = 24
+        button.clipsToBounds = true
+        button.addTarget(self, action: #selector(didTapLogin), for: .touchUpInside)
+        button.isHidden = true
+        return button
+    }()
+
+    @objc private func didTapLogin() {
+        delegate?.didTapLoginButton()
+    }
+
     // MARK: - Version Label
 
     private lazy var versionLabel: UILabel = {
@@ -280,9 +303,34 @@ class ProfileScreen: UIView {
         versionLabel.text = version
     }
 
+    func configureGuestMode(version: String) {
+        nameLabel.text = "Visitante"
+        emailLabel.text = "Entre para acessar todos os recursos"
+        versionLabel.text = version
+
+        accountSectionLabel.isHidden = true
+        accountCardView.isHidden = true
+        logoutButton.isHidden = true
+        deleteAccountButton.isHidden = true
+        loginCTAButton.isHidden = false
+    }
+
+    func configureLoggedMode() {
+        accountSectionLabel.isHidden = false
+        accountCardView.isHidden = false
+        logoutButton.isHidden = false
+        deleteAccountButton.isHidden = false
+        loginCTAButton.isHidden = true
+    }
+
     func setProfilePhoto(_ image: UIImage?) {
         guard let image else { return }
         photoImageView.image = image
+        photoImageView.contentMode = .scaleAspectFill
+    }
+
+    func loadProfilePhoto(from url: URL) {
+        photoImageView.downloadImage(urlString: url.absoluteString)
         photoImageView.contentMode = .scaleAspectFill
     }
 
@@ -365,6 +413,7 @@ class ProfileScreen: UIView {
         legalCardView.addSubview(legalSeparator)
         legalCardView.addSubview(termsOfUseRow)
 
+        containerView.addSubview(loginCTAButton)
         containerView.addSubview(logoutButton)
         containerView.addSubview(deleteAccountButton)
         containerView.addSubview(versionLabel)
@@ -465,6 +514,12 @@ class ProfileScreen: UIView {
             termsOfUseRow.trailingAnchor.constraint(equalTo: legalCardView.trailingAnchor),
             termsOfUseRow.heightAnchor.constraint(equalToConstant: 52),
             termsOfUseRow.bottomAnchor.constraint(equalTo: legalCardView.bottomAnchor),
+
+            // Login CTA (guest)
+            loginCTAButton.topAnchor.constraint(equalTo: legalCardView.bottomAnchor, constant: 32),
+            loginCTAButton.leadingAnchor.constraint(equalTo: accountCardView.leadingAnchor),
+            loginCTAButton.trailingAnchor.constraint(equalTo: accountCardView.trailingAnchor),
+            loginCTAButton.heightAnchor.constraint(equalToConstant: 48),
 
             // Logout
             logoutButton.topAnchor.constraint(equalTo: legalCardView.bottomAnchor, constant: 32),

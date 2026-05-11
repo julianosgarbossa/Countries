@@ -5,7 +5,7 @@
 //  Created by Marcelo Araujo on 20/04/26.
 //
 
-import Foundation
+import UIKit
 import FirebaseAuth
 
 protocol EditProfileViewModelDelegate: AnyObject {
@@ -22,8 +22,14 @@ final class EditProfileViewModel {
 
     private var name: String
     private let initialName: String
+    var newProfileImage: UIImage?
+    private var hasPhotoChange = false
 
     let prefilledName: String
+
+    var photoURL: URL? {
+        AuthService.shared.currentUser?.photoURL
+    }
 
     init() {
         let current = AuthService.shared.currentUser?.displayName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
@@ -42,28 +48,61 @@ final class EditProfileViewModel {
         delegate?.didUpdateFormValidity(isValid: isSaveEnabled())
     }
 
+    func setNewPhoto(_ image: UIImage) {
+        newProfileImage = image
+        hasPhotoChange = true
+        delegate?.didUpdateFormValidity(isValid: isSaveEnabled())
+    }
+
     func save() {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard isSaveEnabled(), InputValidator.validateName(text: trimmed) else { return }
+        guard isSaveEnabled() else { return }
 
         delegate?.didChangeLoadingState(isLoading: true)
 
-        AuthService.shared.updateDisplayName(trimmed) { [weak self] result in
-            DispatchQueue.main.async {
-                self?.delegate?.didChangeLoadingState(isLoading: false)
-                switch result {
-                case .success:
-                    self?.delegate?.didUpdateSuccess()
-                case .failure(let error):
-                    self?.delegate?.didUpdateFailure(message: FirebaseErrorMapper.message(for: error))
+        let nameChanged = trimmed != initialName && InputValidator.validateName(text: trimmed)
+
+        let group = DispatchGroup()
+        var errors: [String] = []
+
+        if nameChanged {
+            group.enter()
+            AuthService.shared.updateDisplayName(trimmed) { result in
+                if case .failure(let error) = result {
+                    errors.append(FirebaseErrorMapper.message(for: error))
                 }
+                group.leave()
+            }
+        }
+
+        if hasPhotoChange, let image = newProfileImage {
+            group.enter()
+            StorageService.shared.uploadProfilePhoto(image) { result in
+                switch result {
+                case .success(let url):
+                    AuthService.shared.updatePhotoURL(url) { _ in
+                        group.leave()
+                    }
+                case .failure(let error):
+                    errors.append(error.localizedDescription)
+                    group.leave()
+                }
+            }
+        }
+
+        group.notify(queue: .main) { [weak self] in
+            self?.delegate?.didChangeLoadingState(isLoading: false)
+            if errors.isEmpty {
+                self?.delegate?.didUpdateSuccess()
+            } else {
+                self?.delegate?.didUpdateFailure(message: errors.joined(separator: "\n"))
             }
         }
     }
 
     private func isSaveEnabled() -> Bool {
-        guard InputValidator.validateName(text: name) else { return false }
-        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed != initialName
+        let nameValid = InputValidator.validateName(text: name)
+        let nameChanged = name.trimmingCharacters(in: .whitespacesAndNewlines) != initialName
+        return (nameValid && nameChanged) || hasPhotoChange
     }
 }

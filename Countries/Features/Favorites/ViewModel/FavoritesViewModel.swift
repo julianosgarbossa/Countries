@@ -9,8 +9,10 @@ import Foundation
 
 final class FavoritesViewModel {
     
-    private let favoritesLocalStorage = FavoritesLocalStorage.shared
+    private let favoritesRepository = FavoritesRepository.shared
     private var favoriteCountries: [Country] = []
+
+    private(set) var state: ViewState = .idle
     
     var numberOfItemsInSection: Int {
         favoriteCountries.count
@@ -31,7 +33,7 @@ final class FavoritesViewModel {
     }
     
     func fetchFavorites(completion: @escaping () -> Void) {
-        let favoriteIds = Array(favoritesLocalStorage.allIds()).sorted()
+        let favoriteIds = Array(favoritesRepository.allIds()).sorted()
         let favoriteIdsSet = Set(favoriteIds)
         let previousVisibleIds = Set(favoriteCountries.map { $0.cca2 })
         
@@ -48,19 +50,22 @@ final class FavoritesViewModel {
         
         guard !favoriteIds.isEmpty else {
             favoriteCountries = []
+            state = .empty(message: emptyStateMessage)
             
             if !didUpdateVisibleList {
                 completion()
             }
             return
         }
+
+        state = .loading
         
         FavoritesService.fetchFavoriteCountries(countryIds: favoriteIds) { [weak self] result in
             guard let self else { return }
             
             switch result {
             case .success(let countriesResponse):
-                let currentFavoriteIds = self.favoritesLocalStorage.allIds()
+                let currentFavoriteIds = self.favoritesRepository.allIds()
                 
                 self.favoriteCountries = countriesResponse
                     .filter { currentFavoriteIds.contains($0.cca2) }
@@ -77,9 +82,11 @@ final class FavoritesViewModel {
                         )
                     }
                     .sorted { $0.name < $1.name }
+                self.state = self.favoriteCountries.isEmpty ? .empty(message: self.emptyStateMessage) : .loaded
             case .failure(let error):
                 print(error)
                 self.favoriteCountries = []
+                self.state = .error(message: error.localizedDescription)
             }
             
             completion()

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CountryDetail {
+struct CountryDetail: CountryDisplayable {
     let cca2: String
     let flag: String
     var isFavorited: Bool
@@ -19,4 +19,7 @@ struct CountryDetail {
     let population: String
     let coin: String
     let languages: [String: String]?
+
+    var displayName: String { countryName }
+    var flagURL: String { flag }
 }

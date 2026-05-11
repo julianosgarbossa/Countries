@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct BorderCountryResponse: Decodable {
+struct BorderCountryResponse: Codable {
     let cca3: String
     let name: CountryName
     let flags: CountryFlag

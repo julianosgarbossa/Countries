@@ -92,6 +92,7 @@ extension CountriesViewController: UICollectionViewDelegateFlowLayout {
 
 extension CountriesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard countriesScreen?.isShimmerActive == false else { return }
         let countrieDetailViewController = CountryDetailViewController(countryId: countriesViewModel.country(at: indexPath.row).cca2)
         navigationController?.pushViewController(countrieDetailViewController, animated: true)
     }
@@ -99,10 +100,21 @@ extension CountriesViewController: UITableViewDelegate {
 
 extension CountriesViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if let shimmerCount = countriesScreen?.shimmerCellCount, shimmerCount > 0 {
+            return shimmerCount
+        }
         return countriesViewModel.numberOfRowsInSection
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if countriesScreen?.isShimmerActive == true {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ShimmerTableViewCell.identifier, for: indexPath) as? ShimmerTableViewCell else {
+                return UITableViewCell()
+            }
+            cell.startShimmering()
+            return cell
+        }
+
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CountrieTableViewCell.identifier, for: indexPath) as? CountrieTableViewCell else { return UITableViewCell() }
         cell.setupCell(countrie: countriesViewModel.country(at: indexPath.row))
         cell.delegate(delegate: self)
@@ -126,5 +138,16 @@ extension CountriesViewController: CountriesViewModelProtocol {
     func countriesViewModelUpdateUI() {
         countriesScreen?.reloadCollectionView()
         updateCountriesListUI()
+    }
+
+    func countriesViewModelDidChangeState(_ state: ViewState) {
+        switch state {
+        case .loading:
+            countriesScreen?.showShimmer()
+        case .loaded, .error, .empty:
+            countriesScreen?.hideShimmer()
+        case .idle:
+            break
+        }
     }
 }

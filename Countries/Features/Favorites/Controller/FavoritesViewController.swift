@@ -39,9 +39,14 @@ class FavoritesViewController: UIViewController {
     }
     
     private func fetchFavorites() {
+        if favoritesViewModel.state != .loaded {
+            favoritesScreen?.showShimmer()
+        }
+
         favoritesViewModel.fetchFavorites { [weak self] in
             guard let self else { return }
             
+            self.favoritesScreen?.hideShimmer()
             self.favoritesScreen?.reloadCollectionView()
             
             if self.favoritesViewModel.shouldShowEmptyState {
@@ -55,6 +60,7 @@ class FavoritesViewController: UIViewController {
 
 extension FavoritesViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard favoritesScreen?.isShimmerActive == false else { return }
         guard let country = favoritesViewModel.countryIfAvailable(at: indexPath.item) else { return }
         
         let countrieDetailViewController = CountryDetailViewController(countryId: country.cca2)
@@ -64,10 +70,21 @@ extension FavoritesViewController: UICollectionViewDelegate {
 
 extension FavoritesViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if let shimmerCount = favoritesScreen?.shimmerCellCount, shimmerCount > 0 {
+            return shimmerCount
+        }
         return favoritesViewModel.numberOfItemsInSection
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if favoritesScreen?.isShimmerActive == true {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ShimmerCollectionViewCell.identifier, for: indexPath) as? ShimmerCollectionViewCell else {
+                return UICollectionViewCell()
+            }
+            cell.startShimmering()
+            return cell
+        }
+
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CountryCollectionViewCell.identifier, for: indexPath) as? CountryCollectionViewCell else { return UICollectionViewCell() }
         
         guard let country = favoritesViewModel.countryIfAvailable(at: indexPath.item) else {

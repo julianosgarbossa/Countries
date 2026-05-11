@@ -20,12 +20,20 @@ final class ProfileViewModel {
 
     weak var delegate: ProfileViewModelDelegate?
 
+    var isLoggedIn: Bool {
+        AuthService.shared.isLoggedIn
+    }
+
     var userName: String {
         AuthService.shared.currentUser?.displayName ?? "Usuário"
     }
 
     var userEmail: String {
         AuthService.shared.currentUser?.email ?? ""
+    }
+
+    var userPhotoURL: URL? {
+        AuthService.shared.currentUser?.photoURL
     }
 
     var appVersion: String {

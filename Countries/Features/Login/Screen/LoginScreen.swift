@@ -11,6 +11,7 @@ protocol LoginScreenDelegate: AnyObject {
     func didTapRecoverPasswordButton()
     func didTapLoginButton()
     func didTapRegisterButton()
+    func didTapContinueWithoutAccountButton()
 }
 
 enum LoginFieldTag: Int {
@@ -237,6 +238,18 @@ class LoginScreen: UIView {
         return button
     }()
     
+    private lazy var continueWithoutAccountButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("Continuar sem conta", for: .normal)
+        button.setTitleColor(UIColor(red: 120/255, green: 120/255, blue: 120/255, alpha: 1), for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        button.titleLabel?.textAlignment = .center
+        button.titleLabel?.numberOfLines = 1
+        button.addTarget(self, action: #selector(didTapContinueWithoutAccount), for: .touchUpInside)
+        return button
+    }()
+
     private lazy var bottomSpacerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -247,6 +260,11 @@ class LoginScreen: UIView {
     @objc
     private func didTapLoginButton(_ sender: UIButton) {
         delegate?.didTapLoginButton()
+    }
+
+    @objc
+    private func didTapContinueWithoutAccount(_ sender: UIButton) {
+        delegate?.didTapContinueWithoutAccountButton()
     }
     
     @objc
@@ -288,6 +306,7 @@ class LoginScreen: UIView {
         cardLoginView.addSubview(loginButton)
         cardLoginView.addSubview(registerLabel)
         cardLoginView.addSubview(registerButton)
+        cardLoginView.addSubview(continueWithoutAccountButton)
         cardLoginView.addSubview(bottomSpacerView)
         
         configConstraints()
@@ -364,8 +383,12 @@ class LoginScreen: UIView {
             registerButton.centerYAnchor.constraint(equalTo: registerLabel.centerYAnchor),
             registerButton.leadingAnchor.constraint(equalTo: registerLabel.trailingAnchor, constant: 4),
             registerButton.heightAnchor.constraint(equalTo: recoverPasswordButton.heightAnchor),
+
+            continueWithoutAccountButton.topAnchor.constraint(equalTo: registerLabel.bottomAnchor, constant: 16),
+            continueWithoutAccountButton.centerXAnchor.constraint(equalTo: cardLoginView.centerXAnchor),
+            continueWithoutAccountButton.heightAnchor.constraint(equalToConstant: 24),
             
-            bottomSpacerView.topAnchor.constraint(equalTo: registerButton.bottomAnchor),
+            bottomSpacerView.topAnchor.constraint(equalTo: continueWithoutAccountButton.bottomAnchor),
             bottomSpacerView.leadingAnchor.constraint(equalTo: emailLabel.leadingAnchor),
             bottomSpacerView.trailingAnchor.constraint(equalTo: emailLabel.trailingAnchor),
             bottomSpacerView.bottomAnchor.constraint(equalTo: cardLoginView.bottomAnchor),

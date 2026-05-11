@@ -36,6 +36,10 @@ final class EditProfileViewController: UIViewController {
         let name = editProfileViewModel.prefilledName
         editProfileScreen?.configure(name: name, email: editProfileViewModel.email)
         editProfileViewModel.updateName(name)
+
+        if let photoURL = editProfileViewModel.photoURL {
+            editProfileScreen?.loadProfilePhoto(from: photoURL)
+        }
     }
 
     private func showErrorAlert(message: String) {
@@ -49,6 +53,31 @@ extension EditProfileViewController: EditProfileScreenDelegate {
     func didTapSaveButton() {
         view.endEditing(true)
         editProfileViewModel.save()
+    }
+
+    func didTapChangePhotoButton() {
+        let picker = UIImagePickerController()
+        picker.sourceType = .photoLibrary
+        picker.delegate = self
+        picker.allowsEditing = true
+        present(picker, animated: true)
+    }
+}
+
+// MARK: - UIImagePickerControllerDelegate
+
+extension EditProfileViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        let image = (info[.editedImage] as? UIImage) ?? (info[.originalImage] as? UIImage)
+        if let image {
+            editProfileScreen?.setProfilePhoto(image)
+            editProfileViewModel.setNewPhoto(image)
+        }
+        picker.dismiss(animated: true)
+    }
+
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true)
     }
 }
 

@@ -59,10 +59,14 @@ class CountriesScreen: UIView {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(CountrieTableViewCell.self, forCellReuseIdentifier: CountrieTableViewCell.identifier)
+        tableView.register(ShimmerTableViewCell.self, forCellReuseIdentifier: ShimmerTableViewCell.identifier)
         tableView.separatorStyle = .none
         tableView.showsVerticalScrollIndicator = false
         return tableView
     }()
+
+    private var isShowingShimmer = false
+    private let shimmerRowCount = 6
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -152,5 +156,24 @@ class CountriesScreen: UIView {
     func hideEmptyState() {
         emptyStateLabel.isHidden = true
         countriesTableView.isHidden = false
+    }
+
+    func showShimmer() {
+        isShowingShimmer = true
+        countriesTableView.isHidden = false
+        emptyStateLabel.isHidden = true
+        countriesTableView.reloadData()
+    }
+
+    func hideShimmer() {
+        isShowingShimmer = false
+    }
+
+    var shimmerCellCount: Int {
+        isShowingShimmer ? shimmerRowCount : 0
+    }
+
+    var isShimmerActive: Bool {
+        isShowingShimmer
     }
 }

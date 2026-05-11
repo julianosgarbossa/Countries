@@ -66,6 +66,12 @@ extension LoginViewController: LoginScreenDelegate {
         let registerViewController = RegisterViewController()
         navigationController?.pushViewController(registerViewController, animated: true)
     }
+
+    func didTapContinueWithoutAccountButton() {
+        let tabBarController = TabBarController()
+        view.window?.rootViewController = tabBarController
+        view.window?.makeKeyAndVisible()
+    }
 }
 
 extension LoginViewController: UITextFieldDelegate {

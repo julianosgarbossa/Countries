@@ -8,56 +8,16 @@
 import Foundation
 
 final class FavoritesService {
-    
+
     static func fetchFavoriteCountries(countryIds: [String], completion: @escaping (Result<[CountryResponse], NetworkError>) -> Void) {
         let codes = countryIds.joined(separator: ",")
-        let urlString = "https://restcountries.com/v3.1/alpha?codes=\(codes)&fields=cca2,capital,region,subregion,name,flags"
-        
-        guard let url = URL(string: urlString) else {
-            completion(.failure(NetworkError.invalidURL(url: urlString)))
-            return
-        }
-        
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            if let error {
-                DispatchQueue.main.async {
-                    completion(.failure(NetworkError.networkFailure(error)))
-                }
-                return
-            }
-            
-            guard let httpResponse = response as? HTTPURLResponse else {
-                DispatchQueue.main.async {
-                    completion(.failure(NetworkError.invalidResponse))
-                }
-                return
-            }
-            
-            guard (200..<300).contains(httpResponse.statusCode) else {
-                DispatchQueue.main.async {
-                    completion(.failure(NetworkError.statusCode(code: httpResponse.statusCode)))
-                }
-                return
-            }
-            
-            guard let data else {
-                DispatchQueue.main.async {
-                    completion(.failure(NetworkError.noData))
-                }
-                return
-            }
-            
-            do {
-                let countries = try JSONDecoder().decode([CountryResponse].self, from: data)
-                DispatchQueue.main.async {
-                    completion(.success(countries))
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(NetworkError.decodingError(error)))
-                }
-            }
-        }
-        task.resume()
+        let endpoint = Endpoint(
+            path: "/alpha",
+            queryItems: [
+                URLQueryItem(name: "codes", value: codes),
+                URLQueryItem(name: "fields", value: "cca2,capital,region,subregion,name,flags")
+            ]
+        )
+        APIClient.shared.request(endpoint, expecting: [CountryResponse].self, completion: completion)
     }
 }

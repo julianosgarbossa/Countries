@@ -92,6 +92,22 @@ final class AuthService {
             completion(.success(()))
         }
     }
+    func updatePhotoURL(_ url: URL, completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let user = currentUser else {
+            completion(.failure(AuthServiceError.noCurrentUser))
+            return
+        }
+        let changeRequest = user.createProfileChangeRequest()
+        changeRequest.photoURL = url
+        changeRequest.commitChanges { error in
+            if let error {
+                completion(.failure(error))
+                return
+            }
+            completion(.success(()))
+        }
+    }
+
     func updatePassword(currentPassword: String, newPassword: String, completion: @escaping (Result<Void, Error>) -> Void) {
         guard let user = currentUser,
               let email = user.email else {

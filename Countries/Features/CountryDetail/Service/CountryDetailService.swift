@@ -8,63 +8,32 @@
 import Foundation
 
 final class CountryDetailService {
-    
-    static func fetchCountryDetail(countryId: String, completion: @escaping (Result<CountryDetailResponse, NetworkError>) -> Void ) {
-        let urlString = "https://restcountries.com/v3.1/alpha/\(countryId)"
-        
-        guard let url = URL(string: urlString) else {
-            completion(.failure(NetworkError.invalidURL(url: urlString)))
+
+    static func fetchCountryDetail(countryId: String, completion: @escaping (Result<CountryDetailResponse, NetworkError>) -> Void) {
+        let cacheKey = "country_detail_\(countryId)"
+
+        if let cached = ResponseCache.shared.load(CountryDetailResponse.self, forKey: cacheKey) {
+            completion(.success(cached))
             return
         }
-        
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            if let error {
-                DispatchQueue.main.async {
-                    completion(.failure(NetworkError.networkFailure(error)))
-                }
-                return
-            }
-            
-            guard let httpResponse = response as? HTTPURLResponse else {
-                DispatchQueue.main.async {
-                    completion(.failure(NetworkError.invalidResponse))
-                }
-                return
-            }
-            
-            guard (200..<300).contains(httpResponse.statusCode) else {
-                DispatchQueue.main.async {
-                    completion(.failure(NetworkError.statusCode(code: httpResponse.statusCode)))
-                }
-                return
-            }
-            
-            guard let data else {
-                DispatchQueue.main.async {
-                    completion(.failure(NetworkError.noData))
-                }
-                return
-            }
-            
-            do {
-                let countries = try JSONDecoder().decode([CountryDetailResponse].self, from: data)
-                
-                guard let countryDetail = countries.first else {
-                    DispatchQueue.main.async {
-                        completion(.failure(NetworkError.noData))
-                    }
+
+        let endpoint = Endpoint(
+            path: "/alpha/\(countryId)",
+            queryItems: []
+        )
+
+        APIClient.shared.request(endpoint, expecting: [CountryDetailResponse].self) { result in
+            switch result {
+            case .success(let list):
+                guard let first = list.first else {
+                    completion(.failure(.noData))
                     return
                 }
-                
-                DispatchQueue.main.async {
-                    completion(.success(countryDetail))
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(NetworkError.decodingError(error)))
-                }
+                ResponseCache.shared.save(first, forKey: cacheKey)
+                completion(.success(first))
+            case .failure(let error):
+                completion(.failure(error))
             }
         }
-        task.resume()
     }
 }

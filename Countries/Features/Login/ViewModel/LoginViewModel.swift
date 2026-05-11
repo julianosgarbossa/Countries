@@ -47,12 +47,17 @@ final class LoginViewModel {
         delegate?.didChangeLoadingState(isLoading: true)
 
         AuthService.shared.login(email: email, password: password) { [weak self] result in
-            DispatchQueue.main.async {
-                self?.delegate?.didChangeLoadingState(isLoading: false)
-                switch result {
-                case .success:
-                    self?.delegate?.didLoginSuccess()
-                case .failure(let error):
+            switch result {
+            case .success:
+                FavoritesRepository.shared.syncAfterLogin {
+                    DispatchQueue.main.async {
+                        self?.delegate?.didChangeLoadingState(isLoading: false)
+                        self?.delegate?.didLoginSuccess()
+                    }
+                }
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    self?.delegate?.didChangeLoadingState(isLoading: false)
                     self?.delegate?.didLoginFailure(message: FirebaseErrorMapper.message(for: error))
                 }
             }
